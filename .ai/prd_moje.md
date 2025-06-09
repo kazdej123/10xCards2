@@ -48,7 +48,7 @@ Ręczne tworzenie wysokiej jakości fiszek jest czasochłonne i zniechęca użyt
 ## 5. Historyjki użytkowników
 - US-001
   Tytuł: Rejestracja nowego użytkownika
-  Opis: Jako nowy użytkownik chcę zarejestrować się przy użyciu email i hasła, aby mieć dostęp do aplikacji.
+  Opis: Jako nowy użytkownik chcę zarejestrować się przy użyciu emaila i hasła, aby mieć dostęp do aplikacji.
   Kryteria akceptacji:
   - w przypadku podania prawidłowego emaila i hasła konto zostaje utworzone i wysyłany jest e-mail potwierdzający
   - przy podaniu istniejącego emaila wyświetlany jest komunikat o duplikacie
