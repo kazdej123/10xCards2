@@ -1,81 +1,92 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { FlashcardProposalDto, GenerationCreateResponseDto } from "../../types";
-import type { Database } from "../../db/database.types";
 
 export class GenerationService {
-  private supabase: SupabaseClient<Database>;
-  private userId: string;
+  constructor(private readonly supabase: SupabaseClient) {}
 
-  constructor(supabase: SupabaseClient<Database>, userId: string) {
-    this.supabase = supabase;
-    this.userId = userId;
-  }
-
-  /**
-   * Generates flashcard proposals using AI based on the provided text
-   * @param sourceText The text to generate flashcards from
-   * @returns Generation response with ID, proposals and count
-   */
-  async generateFlashcards(sourceText: string): Promise<GenerationCreateResponseDto> {
-    const startTime = Date.now();
-
+  async generateFlashcards(sourceText: string, userId: string): Promise<GenerationCreateResponseDto> {
     try {
-      // 1. Create initial generation record
-      const { data: generation, error: insertError } = await this.supabase
-        .from("generations")
-        .insert({
-          user_id: this.userId,
-          model: "gpt-4", // TODO: Make configurable
-          source_text_hash: await this.hashText(sourceText),
-          source_text_length: sourceText.length,
-          generated_count: 0,
-          generation_duration: 0,
-        })
-        .select()
-        .single();
+      // 1.
+      const startTime = Date.now();
+      const sourceTextHash = await this.calculateHash(sourceText);
 
-      if (insertError || !generation) {
-        throw new Error("Failed to create generation record");
-      }
+      // 2.
+      const flashcardProposals = await this.callAIService(sourceText);
 
-      // TODO: 2. Call AI service to generate flashcards
-      // TODO: 3. Update generation record with results
-      // TODO: 4. Return response
+      // 3.
+      const generationId = await this.saveGenerationMetadata({
+        userId,
+        sourceText,
+        sourceTextHash,
+        generatedCount: flashcardProposals.length,
+        durationMs: Date.now() - startTime,
+      });
 
-      throw new Error("Not implemented");
+      return {
+        generation_id: generationId,
+        flashcard_proposals: flashcardProposals,
+        generated_count: flashcardProposals.length,
+      };
     } catch (error) {
-      // Log error and rethrow
-      await this.logGenerationError(sourceText, error);
+      // Log error
+      await this.logGenerationError(error, {
+        userId,
+        sourceTextHash: await this.calculateHash(sourceText),
+        sourceTextLength: sourceText.length,
+      });
       throw error;
     }
   }
 
-  /**
-   * Creates a hash of the source text for deduplication
-   */
-  private async hashText(text: string): Promise<string> {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(text);
-    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+  private async calculateHash(text: string): Promise<string> {
+    // TODO: Implement
+    return text;
   }
 
-  /**
-   * Logs generation errors to the generation_error_logs table
-   */
-  private async logGenerationError(sourceText: string, error: unknown): Promise<void> {
-    try {
-      await this.supabase.from("generation_error_logs").insert({
-        user_id: this.userId,
-        model: "gpt-4", // TODO: Make configurable
-        source_text_hash: await this.hashText(sourceText),
-        source_text_length: sourceText.length,
-        error_code: error instanceof Error ? error.name : "UnknownError",
-        error_message: error instanceof Error ? error.message : String(error),
-      });
-    } catch (logError) {
-      console.error("Failed to log generation error:", logError);
+  private async callAIService(text: string): Promise<FlashcardProposalDto[]> {
+    // TODO: Implement
+    return [];
+  }
+
+  private async saveGenerationMetadata(data: {
+    userId: string;
+    sourceText: string;
+    sourceTextHash: string;
+    generatedCount: number;
+    durationMs: number;
+  }): Promise<number> {
+    const { data: generation, error } = await this.supabase
+      .from("generations")
+      .insert({
+        user_id: data.userId,
+        source_text: data.sourceText,
+        source_text_hash: data.sourceTextHash,
+        source_text_length: data.sourceText.length,
+        generated_count: data.generatedCount,
+        generation_duration: data.durationMs,
+      })
+      .select("id")
+      .single();
+
+    if (error) throw error;
+    return generation.id;
+  }
+
+  private async logGenerationError(
+    error: unknown,
+    data: {
+      userId: string;
+      sourceTextHash: string;
+      sourceTextLength: number;
     }
+  ): Promise<void> {
+    await this.supabase.from("generation_error_logs").insert({
+      user_id: data.userId,
+      error_code: error instanceof Error ? error.name : "UNKNOWN",
+      error_message: error instanceof Error ? error.message : String(error),
+      model: "gpt-4", // TODO: Make configurable
+      source_text_hash: data.sourceTextHash,
+      source_text_length: data.sourceTextLength,
+    });
   }
 }
