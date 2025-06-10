@@ -83,7 +83,7 @@
     {
       "generation_id": 123,
       "flashcard_proposals": [
-        { "id": 1, "front": "Generated Question", "back": "Generated Answer", "source": "ai-full" }
+        { "front": "Generated Question", "back": "Generated Answer", "source": "ai-full" }
       ],
       "generated_count": 5
     }
