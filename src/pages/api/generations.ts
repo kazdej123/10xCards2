@@ -13,7 +13,7 @@ const generateFlashcardsSchema = z.object({
 export const POST: APIRoute = async ({ request, locals }) => {
   try {
     // Get the supabase client from context
-    const supabase = locals.supabase;
+    //const supabase = locals.supabase;
 
     // Get the current user session
     const session = await locals.getSession();
@@ -45,7 +45,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
     // Tmp mock response
     const mockResponse: GenerationCreateResponseDto = {
-      generation_id: "0",
+      generation_id: 0,
       flashcard_proposals: [],
       generated_count: 0,
     };

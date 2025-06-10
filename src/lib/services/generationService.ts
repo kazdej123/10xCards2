@@ -43,7 +43,7 @@ export class GenerationService {
     return text;
   }
 
-  private async callAIService(text: string): Promise<FlashcardProposalDto[]> {
+  private async callAIService(/*text: string*/): Promise<FlashcardProposalDto[]> {
     // TODO: Implement
     return [];
   }
