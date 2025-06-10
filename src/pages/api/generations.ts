@@ -1,6 +1,7 @@
 import { z } from "zod";
 import type { APIRoute } from "astro";
-import type { GenerateFlashcardsCommand, GenerationCreateResponseDto } from "../../types";
+import type { GenerateFlashcardsCommand } from "../../types";
+import { GenerationService } from "../../lib/services/generationService";
 
 // Validation schema for the input
 const generateFlashcardsSchema = z.object({
@@ -12,18 +13,6 @@ const generateFlashcardsSchema = z.object({
 
 export const POST: APIRoute = async ({ request, locals }) => {
   try {
-    // Get the supabase client from context
-    //const supabase = locals.supabase;
-
-    // Get the current user session
-    const session = await locals.getSession();
-    if (!session) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-        headers: { "Content-Type": "application/json" },
-      });
-    }
-
     // Parse and validate input
     const body = (await request.json()) as GenerateFlashcardsCommand;
     const result = generateFlashcardsSchema.safeParse(body);
@@ -41,22 +30,18 @@ export const POST: APIRoute = async ({ request, locals }) => {
       );
     }
 
-    // TODO: Implement the generation service
+    // Generate flashcards using service
+    const generationService = new GenerationService(locals.supabase);
+    const response = await generationService.generateFlashcards(result.data.source_text);
 
-    // Tmp mock response
-    const mockResponse: GenerationCreateResponseDto = {
-      generation_id: 0,
-      flashcard_proposals: [],
-      generated_count: 0,
-    };
-
-    return new Response(JSON.stringify(mockResponse), {
+    return new Response(JSON.stringify(response), {
       status: 201,
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    console.error("Error processing generation request:", error);
-    return new Response(JSON.stringify({ error: "Internal server error" }), {
+    // Log error and return 500
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    return new Response(JSON.stringify({ error: "Internal server error", message: errorMessage }), {
       status: 500,
       headers: { "Content-Type": "application/json" },
     });
