@@ -60,7 +60,7 @@
 
 - **POST** `/api/generations`
   - Initiate an AI generation of flashcard proposals.
-  - Request Body: `{ sourceText: string, model?: string }`
+  - Request Body: `{ sourceText: string }`
   - Validations: `sourceText.length` between 1000 and 10000 characters.
   - Behavior:
     1. Create a new `generations` record with status `pending`.
@@ -106,28 +106,6 @@
   - Fetch a single error log entry.
   - Response: `200 OK` `{ id, error_code, error_message, created_at }`, `404 Not Found`
 
-### 2.5 Learning Sessions
-
-- **POST** `/api/sessions`
-  - Start a new spaced repetition session.
-  - Request Body: `{ count?: number }` (number of cards to include)
-  - Behavior: Select due flashcards via external algorithm service.
-  - Response: `200 OK` `{ sessionId, cards: { flashcardId, front }[] }`
-
-- **GET** `/api/sessions/{sessionId}/next`
-  - Fetch the next flashcard in the session.
-  - Response: `200 OK` `{ flashcardId, front }`, `404 Not Found`
-
-- **POST** `/api/sessions/{sessionId}/feedback`
-  - Submit user recall feedback.
-  - Request Body: `{ flashcardId: bigint, quality: number }` (e.g., 0–5 scale)
-  - Behavior: Forward to spaced repetition algorithm, return next card.
-  - Response: `200 OK` `{ next: { flashcardId, front } }`, `404 Not Found`
-
-- **GET** `/api/sessions/{sessionId}/summary`
-  - Fetch session summary (performance statistics).
-  - Response: `200 OK` `{ total, correct, incorrect, details[] }`
-
 ## 3. Authentication and Authorization
 - All endpoints require `Authorization: Bearer <JWT>` header (except `/auth/*`).
 - Use Supabase JWT validation middleware.
@@ -147,10 +125,3 @@
 ## 5. Pagination, Filtering, and Sorting
 - Use standard query parameters: `page`, `limit`, plus resource-specific filters.
 - Responses include `meta: { page, limit, total }`.
-
-## 6. Security and Performance
-- Rate-limit AI generation endpoint (e.g., 5 requests/minute).
-- Sanitize all inputs to prevent SQL injection.
-- Enable CORS for allowed origins.
-- Use HTTPS and secure cookies for Supabase client.
-- Log and monitor errors via external logging service. 
