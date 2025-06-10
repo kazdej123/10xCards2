@@ -8,7 +8,7 @@
 
 ## 2. Endpoints
 
-### 2.2 Flashcards CRUD
+### 2.1 Flashcards CRUD
 
 - **GET** `/api/flashcards`
   - Fetch a paginated list of flashcards for the authenticated user.
@@ -23,7 +23,7 @@
 - **GET** `/api/flashcards/{id}`
   - Fetch a single flashcard by ID.
   - Path Parameters: `id: bigint`
-  - Response: `200 OK` `{ id, front, back, source, created_at, updated_at }`, `404 Not Found`, `401 Unauthorized`
+  - Response: `200 OK` `{ id, front, back, source, generation_id, created_at, updated_at }`, `404 Not Found`, `401 Unauthorized`
 
 - **POST** `/api/flashcards`
   - Create one or more flashcards (manual or AI-generated).
@@ -64,17 +64,17 @@
   - Path Parameters: `id: bigint`
   - Response: `204 No Content`, `404 Not Found`
 
-### 2.3 Generations
+### 2.2 Generations
 
 - **POST** `/api/generations`
   - Initiate an AI generation of flashcard proposals.
   - Request Body:
     ```json
-    { "sourceText": "User provided text (1000 to 10000 characters)" }
+    { "source_text": "User provided text (1000 to 10000 characters)" }
     ```
-  - Validations: `sourceText.length` between 1000 and 10000 characters.
+  - Validations: `source_text.length` between 1000 and 10000 characters.
   - Behavior:
-    1. Create a new `generations` record with status `pending`.
+    1. Create a new `generations` record.
     2. Call AI model to generate flashcard proposals.
     3. On success: update `generations.generated_count` and return flashcard proposals.
     4. On failure: log to `generation_error_logs` and return `503 Service Unavailable`.
@@ -102,17 +102,38 @@
   - Path Parameters: `id: bigint`
   - Response: `200 OK` `{ id, model, generated_count, accepted_unedited_count, accepted_edited_count, created_at, updated_at }`, `404 Not Found`, `401 Unauthorized`
 
-### 2.4 Generation Error Logs
+- **POST** `/api/generations/{generation_id}/flashcards`
+  - Create flashcards based on a specific generation and update accepted counts.
+  - Path Parameters: `generation_id: bigint`
+  - Request Body:
+    ```json
+    {
+      "flashcards": [
+        {
+          "front": "Question",
+          "back": "Answer",
+          "source": "ai-full" | "ai-edited"
+        }
+      ]
+    }
+    ```
+  - Validations: same as `POST /api/flashcards`.
+  - Behavior:
+    1. Insert provided flashcards linked to `generation_id` and the authenticated `user_id`.
+    2. Update `generations.accepted_unedited_count` or `accepted_edited_count` based on `source`.
+  - Response: `201 Created` `{ data: Flashcard[] }`, `400 Bad Request`, `404 Not Found`, `401 Unauthorized`
 
-- **GET** `/api/generations/errors`
+### 2.3 Generation Error Logs
+
+- **GET** `/api/generation_error_logs`
   - Fetch paginated generation error logs for the authenticated user.
   - Query Parameters: same as `/api/generations`.
-  - Response: `200 OK` `{ data: [{ id, errorCode, errorMessage, created_at }], pagination: { page, limit, total } }`, `401 Unauthorized`
+  - Response: `200 OK` `{ data: [{ id, error_code, error_message, created_at }], pagination: { page, limit, total } }`, `401 Unauthorized`
 
-- **GET** `/api/generations/errors/{id}`
+- **GET** `/api/generation_error_logs/{id}`
   - Fetch a single generation error log entry by ID.
   - Path Parameters: `id: bigint`
-  - Response: `200 OK` `{ id, errorCode, errorMessage, created_at }`, `404 Not Found`, `401 Unauthorized`
+  - Response: `200 OK` `{ id, error_code, error_message, created_at }`, `404 Not Found`, `401 Unauthorized`
 
 ## 3. Authentication and Authorization
 - All endpoints require `Authorization: Bearer <JWT>` header (except `/auth/*`).
@@ -122,7 +143,7 @@
 
 ## 4. Validation and Business Logic
 - **Flashcards**: `front` ≤ 200 chars, `back` ≤ 500 chars.
-- **Generations**: `sourceText` length between 1000 and 10000 chars.
+- **Generations**: `source_text` length between 1000 and 10000 chars.
 - **Generation flow**:
   1. Create a new `generations` record.
   2. Invoke the AI model; handle timeout and errors.
