@@ -15,7 +15,7 @@ const generateFlashcardsSchema = z.object({
 
 export const POST: APIRoute = async ({ request, locals }) => {
   try {
-    // Parse and validate input
+    // 1. Parse and validate input
     const body = (await request.json()) as GenerateFlashcardsCommand;
     const result = generateFlashcardsSchema.safeParse(body);
 
@@ -32,7 +32,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
       );
     }
 
-    // Generate flashcards using service
+    // 2. Generate flashcards using service
     const generationService = new GenerationService(locals.supabase);
     const response = await generationService.generateFlashcards(result.data.source_text);
 
@@ -41,11 +41,33 @@ export const POST: APIRoute = async ({ request, locals }) => {
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    // Log error and return 500
+    // Handle different types of errors
     const errorMessage = error instanceof Error ? error.message : String(error);
-    return new Response(JSON.stringify({ error: "Internal server error", message: errorMessage }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
+
+    // Check if it's an AI service error (should return 503)
+    if (errorMessage.includes("AI service") || errorMessage.includes("timeout")) {
+      return new Response(
+        JSON.stringify({
+          error: "Service temporarily unavailable",
+          message: "AI service is currently unavailable. Please try again later.",
+        }),
+        {
+          status: 503,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
+
+    // All other errors return 500
+    return new Response(
+      JSON.stringify({
+        error: "Internal server error",
+        message: "An unexpected error occurred",
+      }),
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
   }
 };
