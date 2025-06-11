@@ -17,8 +17,8 @@ export class GenerationService {
 
       // 3. Save generation metadata
       const generationId = await this.saveGenerationMetadata({
-        sourceText,
         sourceTextHash,
+        sourceTextLength: sourceText.length,
         generatedCount: flashcardProposals.length,
         durationMs: Date.now() - startTime,
       });
@@ -55,8 +55,8 @@ export class GenerationService {
   }
 
   private async saveGenerationMetadata(data: {
-    sourceText: string;
     sourceTextHash: string;
+    sourceTextLength: number;
     generatedCount: number;
     durationMs: number;
   }): Promise<number> {
@@ -64,9 +64,8 @@ export class GenerationService {
       .from("generations")
       .insert({
         user_id: DEFAULT_USER_ID,
-        source_text: data.sourceText,
         source_text_hash: data.sourceTextHash,
-        source_text_length: data.sourceText.length,
+        source_text_length: data.sourceTextLength,
         generated_count: data.generatedCount,
         generation_duration: data.durationMs,
         model: "gpt-4", // TODO: Make configurable

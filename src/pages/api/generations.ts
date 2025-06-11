@@ -3,6 +3,8 @@ import type { APIRoute } from "astro";
 import type { GenerateFlashcardsCommand } from "../../types";
 import { GenerationService } from "../../lib/services/generationService";
 
+export const prerender = false;
+
 // Validation schema for the input
 const generateFlashcardsSchema = z.object({
   source_text: z
