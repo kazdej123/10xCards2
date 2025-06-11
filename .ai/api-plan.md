@@ -102,27 +102,6 @@
   - Path Parameters: `id: bigint`
   - Response: `200 OK` `{ id, model, generated_count, accepted_unedited_count, accepted_edited_count, created_at, updated_at }`, `404 Not Found`, `401 Unauthorized`
 
-- **POST** `/api/generations/{generation_id}/flashcards`
-  - Create flashcards based on a specific generation and update accepted counts.
-  - Path Parameters: `generation_id: bigint`
-  - Request Body:
-    ```json
-    {
-      "flashcards": [
-        {
-          "front": "Question",
-          "back": "Answer",
-          "source": "ai-full" | "ai-edited"
-        }
-      ]
-    }
-    ```
-  - Validations: same as `POST /api/flashcards`.
-  - Behavior:
-    1. Insert provided flashcards linked to `generation_id` and the authenticated `user_id`.
-    2. Update `generations.accepted_unedited_count` or `accepted_edited_count` based on `source`.
-  - Response: `201 Created` `{ data: Flashcard[] }`, `400 Bad Request`, `404 Not Found`, `401 Unauthorized`
-
 ### 2.3 Generation Error Logs
 
 - **GET** `/api/generation_error_logs`
