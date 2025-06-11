@@ -36,9 +36,7 @@ export interface FlashcardsCreateCommand {
 /**
  * DTO for updating a flashcard.
  */
-export type FlashcardUpdateDto = Partial<
-  Pick<TablesUpdate<"flashcards">, "front" | "back" | "source" | "generation_id">
->;
+export type FlashcardUpdateDto = Partial<Pick<TablesUpdate<"flashcards">, "front" | "back">>;
 
 /**
  * Pagination metadata returned in list responses.
@@ -149,7 +147,7 @@ export interface AcceptGenerationFlashcardsResponseDto {
  */
 export type GenerationErrorLogDto = Pick<
   Tables<"generation_error_logs">,
-  "id" | "error_code" | "error_message" | "model" | "source_text_hash" | "source_text_length" | "created_at" | "user_id"
+  "id" | "error_code" | "error_message" | "model" | "source_text_hash" | "source_text_length" | "created_at"
 >;
 
 /**

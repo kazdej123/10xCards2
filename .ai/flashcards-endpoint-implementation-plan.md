@@ -31,10 +31,10 @@ Celem endpointu jest masowe tworzenie fiszek (zarówno manualnych, jak i wygener
 - Walidacja (Zod):
   - Obiekt musi zawierać klucz `flashcards` będący tablicą długości minimum 1.
   - Dla każdego elementu:
-    - `front`: string, 1–200 znaków.
-    - `back`: string, 1–500 znaków.
-    - `source`: enum `"manual" | "ai-full" | "ai-edited"`.
-    - Jeśli `source` w (`"ai-full"`, `"ai-edited"`), `generation_id`: integer.
+    - `front`: string, niepusty, maksymalnie 200 znaków.
+    - `back`: string, niepusty, maksymalnie 500 znaków.
+    - `source`: enum `"ai-full" | "ai-edited" | "manual"`.
+    - Jeśli `source` w (`"ai-full"`, `"ai-edited"`), `generation_id`: wymagane, number.
     - Jeśli `source` === `"manual"`, `generation_id` musi być `null`.
 - Wykorzystywane typy:
   - `FlashcardsCreateCommand` (DTO dla tablicy fiszek).
@@ -65,12 +65,16 @@ Celem endpointu jest masowe tworzenie fiszek (zarówno manualnych, jak i wygener
 1. Ekstrakcja instancji Supabase z `context.locals.supabase` w handlerze Astro.
 2. Weryfikacja sesji użytkownika; jeśli brak lub nieważny, zwróć 401 Unauthorized.
 3. Parsowanie i walidacja ciała żądania schematem Zod.
-4. (Opcjonalnie) Weryfikacja, że każda `generation_id` z `source` AI należy do bieżącego użytkownika:
-   - Zapytanie do tabeli `generations` filtrowane po `user_id`.
-   - Jeśli któryś `generation_id` nie istnieje lub ma inny `user_id`, zwróć 400 Bad Request.
+4. Weryfikacja własności `generation_id` dla fiszek AI-generowanych:
+   - Zbierz wszystkie unikalne `generation_id` z fiszek o `source` w (`"ai-full"`, `"ai-edited"`).
+   - Zapytanie do tabeli `generations` filtrowane po `user_id` i `id IN (generation_ids)`.
+   - Jeśli któryś `generation_id` nie istnieje lub nie należy do użytkownika, zwróć 400 Bad Request.
 5. Przygotowanie tablicy rekordów przez dodanie `user_id` do każdego obiektu.
 6. Batch insert: `supabase.from('flashcards').insert(records).select('*')`.
-7. Zwrócenie wstawionych rekordów jako odpowiedź.
+7. Aktualizacja liczników w tabeli `generations` dla fiszek AI-generowanych:
+   - Policz `accepted_unedited_count` (source="ai-full") i `accepted_edited_count` (source="ai-edited") dla każdego `generation_id`.
+   - Zaktualizuj odpowiednie rekordy w tabeli `generations` zwiększając liczniki.
+8. Zwrócenie wstawionych rekordów jako odpowiedź.
 
 ## 5. Względy bezpieczeństwa
 - Uwierzytelnianie: wymaganie JWT z Supabase Auth.
@@ -81,31 +85,33 @@ Celem endpointu jest masowe tworzenie fiszek (zarówno manualnych, jak i wygener
 ## 6. Obsługa błędów
 - 400 Bad Request:
   - Nieprawidłowy JSON lub nieprzechodzący walidacji Zod.
-  - Niespójność `source` i `generation_id`.
+  - Niespójność `source` i `generation_id` (wymagane dla AI, null dla manual).
   - `generation_id` nie istnieje lub nie należy do użytkownika.
+  - Pusta tablica fiszek lub przekroczenie limitu (max 100 fiszek).
 - 401 Unauthorized:
-  - Brak lub nieważny token.
+  - Brak lub nieważny token JWT.
+  - Nieważna sesja użytkownika.
 - 500 Internal Server Error:
   - Błędy bazy danych lub nieoczekiwane wyjątki.
   - Zwrócenie ogólnego komunikatu, szczegóły logowane po stronie serwera.
 
-## 7. Wydajność
+## 7. Rozważania dotyczące wydajności
 - Batch insert zamiast wielu pojedynczych zapytań.
 - Indeks na kolumnie `generation_id` w tabeli `flashcards`.
-- Ograniczenie maksymalnej liczby fiszek na jedno żądanie.
+- Ograniczenie maksymalnej liczby fiszek na jedno żądanie (max 100).
 - Monitoring latencji i liczby błędów endpointu.
 
-## 8. Kroki implementacji
+## 8. Kroki wdrożenia
 1. Utworzyć plik `src/pages/api/flashcards.ts`.
 2. Zaimportować:
    - `z` z `zod`.
    - `FlashcardsCreateCommand`, `FlashcardCreateDto`, `CreateFlashcardsResponseDto` z `src/types.ts`.
    - instancję Supabase z `context.locals.supabase`.
-3. Zdefiniować schemat Zod dla `FlashcardsCreateCommand` i odpowiedniego refinmentu dla `generation_id`.
+3. Zdefiniować schemat Zod dla `FlashcardsCreateCommand` z refinementem walidującym spójność `source` i `generation_id`.
 4. W handlerze:
    - Ekstrakcja sesji i `user.id`.
-   - Parsowanie i walidacja ciała.
-   - (Opcjonalnie) Weryfikacja własności `generation_id`.
+   - Parsowanie i walidacja ciała żądania.
+   - Weryfikacja własności `generation_id` dla fiszek AI-generowanych.
    - Przygotowanie rekordów z `user_id`.
    - Wywołanie `supabase.from('flashcards').insert(...).select('*')`.
    - Obsługa zwróconych danych i błędów.

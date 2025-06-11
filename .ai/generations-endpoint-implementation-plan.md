@@ -46,7 +46,7 @@ Ten endpoint umożliwia inicjację generowania propozycji fiszek przez AI na pod
 - Kody statusu
   - 201 Created – Pomyślne utworzenie generacji
   - 400 Bad Request – Błędne dane wejściowe (np. nieprawidłowa długość `source_text`)
-  - 401 Unauthorized – Brak lub nieprawidłowy token
+  - 401 Unauthorized – Brak lub nieprawidłowy token JWT
   - 503 Service Unavailable – Błąd serwisu AI lub timeout (z logowaniem do `generation_error_logs`)
   - 500 Internal Server Error – Wewnętrzny błąd serwera lub bazy danych
 
@@ -69,12 +69,19 @@ Ten endpoint umożliwia inicjację generowania propozycji fiszek przez AI na pod
 - Zapobieganie XSS/SQL Injection: użycie parametrów w Supabase SDK i Zod.
 
 ## 7. Obsługa błędów
-- 400 Bad Request: nieprawidłowe dane wejściowe (Zod).
-- 401 Unauthorized: brak/nieprawidłowy token.
-- 503 Service Unavailable: błąd w usłudze AI lub timeout.
+- 400 Bad Request: 
+  - Nieprawidłowe dane wejściowe (walidacja Zod).
+  - Nieprawidłowa długość `source_text` (poza zakresem 1000-10000 znaków).
+- 401 Unauthorized: 
+  - Brak lub nieważny token JWT.
+  - Nieważna sesja użytkownika.
+- 503 Service Unavailable: 
+  - Błąd w usłudze AI lub timeout.
   - Dodatkowo: w logach `generation_error_logs` zapisać rekord z polami:
     `user_id`, `model`, `source_text_hash`, `source_text_length`, `error_code`, `error_message`.
-- 500 Internal Server Error: błąd wewnętrzny bazy danych lub serwera.
+- 500 Internal Server Error: 
+  - Błąd wewnętrzny bazy danych lub serwera.
+  - Zwrócenie ogólnego komunikatu, szczegóły logowane po stronie serwera.
 
 ## 8. Rozważania dotyczące wydajności
 - Timeout dla wywołania AI: 60 sekund, w przeciwnym razie przerwać operację (timeout)
