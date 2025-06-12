@@ -1,8 +1,11 @@
 import { useState } from "react";
 import type { FlashcardProposalDto, GenerationCreateResponseDto } from "../types";
 import { TextInputArea } from "./TextInputArea";
+import { GenerateButton } from "./GenerateButton";
+import { SkeletonLoader } from "./SkeletonLoader";
+import { FlashcardList } from "./FlashcardList";
 
-interface FlashcardProposalViewModel extends FlashcardProposalDto {
+export interface FlashcardProposalViewModel extends FlashcardProposalDto {
   id: string;
   status: "pending" | "accepted" | "rejected" | "edited";
   isEditing?: boolean;
@@ -58,11 +61,40 @@ export function FlashcardGenerationView() {
     }
   };
 
+  const handleAccept = (id: string) => {
+    setFlashcards((current) => current.map((card) => (card.id === id ? { ...card, status: "accepted" } : card)));
+  };
+
+  const handleEdit = (id: string, newFront: string, newBack: string) => {
+    setFlashcards((current) =>
+      current.map((card) => (card.id === id ? { ...card, front: newFront, back: newBack, status: "edited" } : card))
+    );
+  };
+
+  const handleReject = (id: string) => {
+    setFlashcards((current) => current.map((card) => (card.id === id ? { ...card, status: "rejected" } : card)));
+  };
+
   return (
     <div className="space-y-6">
-      <TextInputArea value={textValue} onChange={handleTextChange} disabled={isLoading} />
+      <div className="space-y-4">
+        <TextInputArea value={textValue} onChange={handleTextChange} disabled={isLoading} />
+        <div className="flex justify-end">
+          <GenerateButton
+            onClick={handleGenerateClick}
+            disabled={textValue.length < 1000 || textValue.length > 10000}
+            isLoading={isLoading}
+          />
+        </div>
+      </div>
+
       {errorMessage && <div className="bg-destructive/15 text-destructive px-4 py-3 rounded-md">{errorMessage}</div>}
-      {/* Other components will be added here */}
+
+      {isLoading ? (
+        <SkeletonLoader />
+      ) : (
+        <FlashcardList flashcards={flashcards} onAccept={handleAccept} onEdit={handleEdit} onReject={handleReject} />
+      )}
     </div>
   );
 }
