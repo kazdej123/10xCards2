@@ -33,25 +33,30 @@ Nawigacja realizowana jest przez topbar z Navigation Menu, który scrolluje wraz
 
 ### Widok generowania AI
 - **Ścieżka widoku:** `/generate`
-- **Główny cel:** Umożliwienie użytkownikom wklejania tekstu i generowania propozycji fiszek przez AI
+- **Główny cel:** Umożliwienie użytkownikom wprowadzenia tekstu (1000-10000 znaków) i wygenerowania propozycji fiszek przez AI oraz ich zarządzanie przed zapisem.
 - **Kluczowe informacje do wyświetlenia:**
-  - Textarea z tekstem źródłowym (1000-10000 znaków)
-  - Character counter z walidacją kolorową
-  - Loading state podczas generowania ("Generowanie...")
+  - Pole tekstowe do wprowadzenia tekstu źródłowego
+  - Licznik znaków z walidacją długości tekstu
+  - Przycisk generowania fiszek
+  - Loading state podczas generowania (skeleton)
   - Lista propozycji fiszek z podziałem front/back
-  - Bulk actions toolbar
+  - Przyciski akcji dla każdej fiszki: "Zatwierdź", "Edytuj", "Odrzuć"
+  - Przycisk zapisu zbiorczego wybranych fiszek
 - **Kluczowe komponenty widoku:**
-  - CustomTextarea z fixed height 200px i character counter
-  - GenerateButton z loading state
-  - FlashcardProposalsList z checkboxami
-  - BulkActionsToolbar ("Zapisz wszystkie", "Zapisz zatwierdzone")
-  - ProgressIndicator
+  - FlashcardGenerationView - główny kontener widoku
+  - TextInputArea - pole tekstowe z walidacją
+  - GenerateButton - przycisk inicjujący proces generowania
+  - FlashcardList - lista wyświetlająca propozycje fiszek
+  - FlashcardListItem - pojedynczy element listy propozycji
+  - SkeletonLoader - wskaźnik ładowania
+  - ErrorNotification - komunikaty o błędach
+  - BulkSaveButton - przycisk zapisu zbiorczego
 - **UX, dostępność i względy bezpieczeństwa:**
-  - Real-time character counting z kolorowaniem (czerwony/biały)
-  - Disabled states dla przycisków gdy brak fiszek
-  - Keyboard shortcuts (Enter dla generowania)
-  - Toast notifications dla błędów API
-  - Proper focus management podczas loading states
+  - Walidacja długości tekstu (1000-10000 znaków) w czasie rzeczywistym
+  - Dezaktywacja przycisków w przypadku nieprawidłowych danych
+  - Skeleton loading podczas oczekiwania na odpowiedź API
+  - Toast notifications dla błędów API i walidacji
+  - Proper focus management i keyboard navigation
 
 ### Moje Fiszki
 - **Ścieżka widoku:** `/flashcards`
