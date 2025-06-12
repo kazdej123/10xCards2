@@ -1,9 +1,15 @@
 import { useState } from "react";
-import type { FlashcardProposalDto, GenerationCreateResponseDto } from "../types";
+import type {
+  FlashcardProposalDto,
+  GenerationCreateResponseDto,
+  FlashcardsCreateCommand,
+  FlashcardCreateDto,
+} from "../types";
 import { TextInputArea } from "./TextInputArea";
 import { GenerateButton } from "./GenerateButton";
 import { SkeletonLoader } from "./SkeletonLoader";
 import { FlashcardList } from "./FlashcardList";
+import { BulkSaveButton } from "./BulkSaveButton";
 
 export interface FlashcardProposalViewModel extends FlashcardProposalDto {
   id: string;
@@ -14,8 +20,10 @@ export interface FlashcardProposalViewModel extends FlashcardProposalDto {
 export function FlashcardGenerationView() {
   const [textValue, setTextValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [flashcards, setFlashcards] = useState<FlashcardProposalViewModel[]>([]);
+  const [generationId, setGenerationId] = useState<number | null>(null);
 
   const handleTextChange = (value: string) => {
     setTextValue(value);
@@ -45,6 +53,7 @@ export function FlashcardGenerationView() {
       }
 
       const data: GenerationCreateResponseDto = await response.json();
+      setGenerationId(data.generation_id);
 
       const flashcardsWithIds: FlashcardProposalViewModel[] = data.flashcard_proposals.map((proposal) => ({
         ...proposal,
@@ -75,6 +84,60 @@ export function FlashcardGenerationView() {
     setFlashcards((current) => current.map((card) => (card.id === id ? { ...card, status: "rejected" } : card)));
   };
 
+  const saveFlashcards = async (cardsToSave: FlashcardProposalViewModel[]) => {
+    if (!generationId) {
+      setErrorMessage("Generation ID is missing. Please try generating flashcards again.");
+      return;
+    }
+
+    setIsSaving(true);
+    setErrorMessage(null);
+
+    try {
+      const flashcardsToSave: FlashcardCreateDto[] = cardsToSave.map((card) => ({
+        front: card.front,
+        back: card.back,
+        source: card.status === "edited" ? "ai-edited" : "ai-full",
+        generation_id: generationId,
+      }));
+
+      const response = await fetch("/api/flashcards", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ flashcards: flashcardsToSave } as FlashcardsCreateCommand),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status}`);
+      }
+
+      // Remove saved cards from the list
+      setFlashcards((current) => current.filter((card) => !cardsToSave.some((saved) => saved.id === card.id)));
+    } catch (error) {
+      setErrorMessage("Failed to save flashcards. Please try again.");
+      console.error("Save error:", error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleSaveAccepted = () => {
+    const acceptedCards = flashcards.filter((card) => card.status === "accepted" || card.status === "edited");
+    if (acceptedCards.length === 0) return;
+    saveFlashcards(acceptedCards);
+  };
+
+  const handleSaveAll = () => {
+    const cardsToSave = flashcards.filter((card) => card.status !== "rejected");
+    if (cardsToSave.length === 0) return;
+    saveFlashcards(cardsToSave);
+  };
+
+  const acceptedCount = flashcards.filter((card) => card.status === "accepted" || card.status === "edited").length;
+  const totalCount = flashcards.filter((card) => card.status !== "rejected").length;
+
   return (
     <div className="space-y-6">
       <div className="space-y-4">
@@ -93,7 +156,19 @@ export function FlashcardGenerationView() {
       {isLoading ? (
         <SkeletonLoader />
       ) : (
-        <FlashcardList flashcards={flashcards} onAccept={handleAccept} onEdit={handleEdit} onReject={handleReject} />
+        <>
+          <FlashcardList flashcards={flashcards} onAccept={handleAccept} onEdit={handleEdit} onReject={handleReject} />
+          {flashcards.length > 0 && (
+            <BulkSaveButton
+              onSaveAll={handleSaveAll}
+              onSaveAccepted={handleSaveAccepted}
+              disabled={false}
+              isLoading={isSaving}
+              acceptedCount={acceptedCount}
+              totalCount={totalCount}
+            />
+          )}
+        </>
       )}
     </div>
   );
