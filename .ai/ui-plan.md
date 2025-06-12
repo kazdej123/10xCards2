@@ -126,8 +126,8 @@ Nawigacja realizowana jest przez topbar z Navigation Menu, który scrolluje wraz
 3. **Generowanie AI - Wklejanie tekstu** → Wpisanie/wklejenie tekstu (1000-10000 znaków)
 4. **Walidacja tekstu** → Real-time character counter z kolorowaniem
 5. **Generowanie AI** → Kliknięcie "Generuj" → Loading state → Lista propozycji
-6. **Przegląd propozycji** → Zaznaczanie checkboxów → Opcjonalna edycja inline
-7. **Bulk zapisywanie** → "Zapisz wszystkie" lub "Zapisz zatwierdzone" → Toast confirmation
+6. **Przegląd propozycji** → Akcje na pojedynczych fiszkach (zatwierdź, edytuj, odrzuć)
+7. **Bulk zapisywanie** → "Zapisz wszystkie" lub "Zapisz zaakceptowane" → Toast confirmation
 8. **Przejście do Moich Fiszek** → Navigation Menu → Przeglądanie zapisanych fiszek
 9. **Zarządzanie fiszkami** → Inline editing, usuwanie z confirmation, dodawanie ręczne
 10. **Sesja nauki** → Navigation Menu → Algorytm spaced repetition
@@ -180,15 +180,15 @@ Nawigacja realizowana jest przez topbar z Navigation Menu, który scrolluje wraz
 - **Funkcjonalności:** Flip animation, inline editing, selection state, progress tracking
 - **Props interface:** mode, flashcard data, callbacks, edit permissions
 
-### CustomTextarea
-- **Specyficzne cechy:** Fixed height 200px, character counter (format: liczba/10000)
-- **Walidacja:** Real-time z kolorowaniem (czerwony przy błędnej liczbie, biały przy poprawnej)
+### TextInputArea  
+- **Specyficzne cechy:** Pole tekstowe z walidacją długości (1000-10000 znaków)
+- **Walidacja:** Real-time walidacja z komunikatami błędów
 - **Accessibility:** ARIA labels, proper focus management, validation messages
 
-### BulkActionsToolbar
-- **Przyciski:** "Zapisz wszystkie", "Zapisz zatwierdzone"
-- **States:** Disabled gdy brak fiszek, loading podczas operacji API
-- **Funkcjonalności:** Bulk selection management, progress feedback
+### BulkSaveButton
+- **Przyciski:** "Zapisz wszystkie", "Zapisz zaakceptowane"
+- **States:** Disabled gdy brak zaakceptowanych fiszek, loading podczas operacji API
+- **Funkcjonalności:** Bulk save management, progress feedback
 
 ### InlineEditor
 - **Activation:** Single-click z kursorem w miejscu kliknięcia
