@@ -151,7 +151,11 @@ export function FlashcardGenerationView() {
         </div>
       </div>
 
-      {errorMessage && <div className="bg-destructive/15 text-destructive px-4 py-3 rounded-md">{errorMessage}</div>}
+      {errorMessage && (
+        <div className="bg-destructive/15 text-destructive px-4 py-3 rounded-md border border-destructive/20">
+          {errorMessage}
+        </div>
+      )}
 
       {isLoading ? (
         <SkeletonLoader />
