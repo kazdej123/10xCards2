@@ -30,6 +30,7 @@
 - `RegisterForm.tsx`:
   - Pola: email, hasło, potwierdzenie hasła.
   - Walidacja w locie (min. długość hasła 8, zgodność haseł, poprawny format email).
+  - Walidacja zgodności pola "hasło" z "potwierdzeniem hasła" przed wysłaniem.
   - Fetch POST do `/api/auth/register`.
 - `LoginForm.tsx`:
   - Pola: email, hasło.
@@ -39,10 +40,12 @@
 - `ForgotPasswordForm.tsx`:
   - Pole: email.
   - Wywołuje POST `/api/auth/forgot-password`, po sukcesie wyświetla komunikat "Sprawdź skrzynkę pocztową".
+  - Implementuje proces odzyskiwania hasła zgodnie z US-002B.
 - `ResetPasswordForm.tsx`:
   - Pola: nowe hasło, potwierdzenie hasła.
-  - Walidacja jak w rejestracji.
+  - Walidacja jak w rejestracji (min. 8 znaków, zgodność haseł).
   - Fetch POST do `/api/auth/reset-password` z tokenem z query.
+  - Link resetowania hasła ważny przez ograniczony czas (24 godziny zgodnie z US-002B).
 - `UserMenu.tsx`:
   - Wyświetla email użytkownika i przycisk "Wyloguj się" → wywołanie POST `/api/auth/logout`.
 
@@ -52,6 +55,7 @@
   - Akcje: `login`, `logout`, `register`, `updateUser`.
   - Inicjalizacja na podstawie danych sesji z Supabase.
   - Automatyczna aktualizacja stanu po akcjach autoryzacyjnych.
+  - Implementuje bezpieczny dostęp zgodnie z US-009 (tylko zalogowany użytkownik ma dostęp do swoich fiszek).
 
 ### 1.5 Oddzielenie odpowiedzialności
 - Strony Astro: ładowanie odpowiedniego layoutu, przekazanie parametrów z URL do props komponentu React oraz SSR (ograniczony do pobrania tokena z query i sprawdzenia sesji).
@@ -78,7 +82,8 @@
 2. **Logowanie** → redirect do strony głównej, przy błędzie komunikat.
 3. **Wylogowanie** → usunięcie sesji i redirect do `/login`.
 4. **Odzyskiwanie hasła** → wysłanie maila, komunikat i pozostanie na stronie forgot-password.
-5. **Reset hasła przez link z maila** → pobranie tokena, ustawienie nowego hasła i redirect do `/login`.
+5. **Reset hasła przez link z maila** → pobranie tokena (ważny 24h), ustawienie nowego hasła i redirect do `/login`.
+6. **Bezpieczny dostęp (US-009)** → tylko zalogowany użytkownik może wyświetlać, edytować i usuwać swoje fiszki.
 
 ## 2. LOGIKA BACKENDOWA
 
@@ -142,10 +147,12 @@
 - Wszystkie operacje autoryzacyjne odbywają się po stronie backendu w bezpiecznym środowisku (HTTPS).
 - Używanie ciasteczek do przechowywania tokenów JWT w sposób bezpieczny (np. HttpOnly, Secure).
 - Stosowanie ochrony przed atakami CSRF i XSS.
-- Brak wykorzystania zewnętrznych serwisów logowania, zgodnie z wymaganiami US-004.
+- Brak wykorzystania zewnętrznych serwisów logowania (zgodnie z wymaganiami PRD sekcja 3.3).
+- Implementacja wymagań US-009: zabezpieczenie dostępu do danych użytkownika - tylko zalogowany użytkownik może wyświetlać, edytować i usuwać swoje fiszki.
+- Brak dostępu do fiszek innych użytkowników ani możliwości współdzielenia (US-009).
 
 ---
 
 **Podsumowanie**: Przedstawiona specyfikacja zapewnia kompleksową integrację modułu rejestracji i logowania użytkowników, spójną z istniejącą architekturą aplikacji opartą na Astro, React, Supabase Auth, Tailwind CSS oraz Zustand. System gwarantuje przejrzystą walidację danych, obsługę wyjątków oraz bezpieczne zarządzanie sesjami przez przekazywanie danych sesji jako props do klienta, umożliwiając dostęp do chronionych funkcjonalności (np. kolekcje reguł).
 
-*Specyfikacja przygotowana w oparciu o PRD (US-001, US-002) oraz tech stack: Astro 5, React 19, TypeScript 5, Tailwind 4, Shadcn/ui, Supabase Auth.* 
+*Specyfikacja przygotowana w oparciu o PRD (US-001, US-002, US-002B, US-009) oraz tech stack: Astro 5, React 19, TypeScript 5, Tailwind 4, Shadcn/ui, Supabase Auth.* 
