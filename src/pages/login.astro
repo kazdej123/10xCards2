@@ -1,0 +1,14 @@
+import { LoginForm } from "../components/auth/LoginForm";
+import Layout from "../layouts/Layout.astro";
+
+// Redirect if already logged in
+const session = null; // Will be implemented later
+if (session) {
+  return Astro.redirect("/");
+}
+
+<Layout title="Logowanie - 10xCards.ai">
+  <main class="container max-w-screen-xl mx-auto px-4 py-8">
+    <LoginForm client:load />
+  </main>
+</Layout> 
