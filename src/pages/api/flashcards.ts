@@ -72,7 +72,6 @@ export const POST: APIRoute = async ({ request, locals }) => {
         .in("id", aiGenerationIds);
 
       if (generationsError) {
-        console.error("Error verifying generation ownership:", generationsError);
         return new Response(JSON.stringify({ error: "Failed to verify generation ownership" }), { status: 500 });
       }
 
@@ -106,7 +105,6 @@ export const POST: APIRoute = async ({ request, locals }) => {
       .select("id, front, back, source, generation_id, created_at, updated_at");
 
     if (insertError) {
-      console.error("Error inserting flashcards:", insertError);
       return new Response(JSON.stringify({ error: "Failed to create flashcards" }), { status: 500 });
     }
 
@@ -161,8 +159,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
         "Content-Type": "application/json",
       },
     });
-  } catch (error) {
-    console.error("Error processing flashcards creation:", error);
+  } catch {
     return new Response(JSON.stringify({ error: "Internal server error" }), { status: 500 });
   }
 };

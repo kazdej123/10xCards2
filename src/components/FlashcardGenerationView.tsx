@@ -62,9 +62,8 @@ export function FlashcardGenerationView() {
       }));
 
       setFlashcards(flashcardsWithIds);
-    } catch (error) {
+    } catch {
       setErrorMessage("Failed to generate flashcards. Please try again.");
-      console.error("Generation error:", error);
     } finally {
       setIsLoading(false);
     }
@@ -115,9 +114,8 @@ export function FlashcardGenerationView() {
 
       // Remove saved cards from the list
       setFlashcards((current) => current.filter((card) => !cardsToSave.some((saved) => saved.id === card.id)));
-    } catch (error) {
+    } catch {
       setErrorMessage("Failed to save flashcards. Please try again.");
-      console.error("Save error:", error);
     } finally {
       setIsSaving(false);
     }

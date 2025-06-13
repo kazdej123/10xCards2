@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Button } from "../ui/button";
-import { Card } from "../ui/card";
 import { Label } from "../ui/label";
 
 export function LoginForm() {
