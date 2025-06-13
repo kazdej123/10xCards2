@@ -6,69 +6,6 @@ import { apiResponseSchema, configSchema, requestPayloadSchema } from "./openRou
 
 import { OpenRouterLogger } from "./openRouterLogger";
 
-// Types
-export interface ModelParameters {
-  temperature?: number;
-  top_p?: number;
-  frequency_penalty?: number;
-  presence_penalty?: number;
-}
-
-export type RequestPayload = {
-  messages: {
-    role: "system" | "user";
-    content: string;
-  }[];
-  model: string;
-  response_format?: {
-    type: "json_object";
-    schema: Record<string, unknown>;
-  };
-} & ModelParameters;
-
-export interface ApiResponse {
-  choices: {
-    message: {
-      content: string;
-      role: string;
-    };
-  }[];
-}
-
-export interface OpenRouterConfig {
-  apiKey: string;
-  apiUrl?: string;
-  timeout?: number;
-  retries?: number;
-  defaultModel?: string;
-  defaultModelParameters?: ModelParameters;
-}
-
-// Error types
-export class OpenRouterError extends Error {
-  constructor(
-    message: string,
-    public readonly cause?: unknown
-  ) {
-    super(message);
-    this.name = "OpenRouterError";
-  }
-}
-
-export class OpenRouterAuthError extends OpenRouterError {
-  constructor(message: string, cause?: unknown) {
-    super(message, cause);
-    this.name = "OpenRouterAuthError";
-  }
-}
-
-export class OpenRouterRateLimitError extends OpenRouterError {
-  constructor(message: string, cause?: unknown) {
-    super(message, cause);
-    this.name = "OpenRouterRateLimitError";
-  }
-}
-
 export class OpenRouterService {
   private readonly apiKey: string;
   private readonly apiUrl: string;
@@ -188,11 +125,13 @@ export class OpenRouterService {
         });
       }
 
-      // Add user message
-      messages.push({
-        role: "user" as const,
-        content: this.currentUserMessage!,
-      });
+      // Add user message - we've already validated it exists
+      if (this.currentUserMessage) {
+        messages.push({
+          role: "user" as const,
+          content: this.currentUserMessage,
+        });
+      }
 
       const payload: RequestPayload = {
         messages,

@@ -11,6 +11,7 @@ export class OpenRouterLogger {
   private static instance: OpenRouterLogger;
   private logs: LogEntry[] = [];
 
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   private constructor() {}
 
   public static getInstance(): OpenRouterLogger {
@@ -61,6 +62,7 @@ export class OpenRouterLogger {
 
     // Log to console in development
     if (import.meta.env.DEV) {
+      // eslint-disable-next-line no-console
       console.log(`[OpenRouter][${entry.level.toUpperCase()}] ${entry.message}`, entry.data || "");
     }
   }
