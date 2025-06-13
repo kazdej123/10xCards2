@@ -11,7 +11,7 @@ export function AuthButtons({ isLoggedIn, onLogout }: AuthButtonsProps) {
       <Button
         variant="outline"
         onClick={onLogout}
-        className="text-destructive hover:text-destructive hover:bg-destructive/10"
+        className="text-red-200 hover:text-red-100 border-red-400/50 hover:bg-red-500/20 hover:border-red-400/70 transition-all duration-200"
       >
         Wyloguj
       </Button>
@@ -19,11 +19,18 @@ export function AuthButtons({ isLoggedIn, onLogout }: AuthButtonsProps) {
   }
 
   return (
-    <div className="flex gap-4">
-      <Button variant="outline" asChild>
+    <div className="flex gap-3">
+      <Button
+        variant="outline"
+        asChild
+        className="border-white/30 text-white hover:bg-white/10 hover:border-white/50 transition-all duration-200"
+      >
         <a href="/login">Logowanie</a>
       </Button>
-      <Button asChild>
+      <Button
+        asChild
+        className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white transition-all duration-200 shadow-lg hover:shadow-xl"
+      >
         <a href="/register">Rejestracja</a>
       </Button>
     </div>

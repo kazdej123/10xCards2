@@ -1,8 +1,38 @@
 ---
+import { AuthButtons } from "../components/auth/AuthButtons";
 import Welcome from "../components/Welcome.astro";
 import Layout from "../layouts/Layout.astro";
+
+// Check user session - will be implemented with Supabase later
+const session = null; // Will be replaced with actual session check
+const isLoggedIn = !!session;
 ---
 
-<Layout>
-  <Welcome />
+<Layout title="10xCards.ai">
+  {
+    isLoggedIn ? (
+      <div class="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-blue-900 p-4">
+        <div class="max-w-4xl mx-auto">
+          <div class="flex justify-between items-center mb-8 p-6 bg-white/10 backdrop-blur-xl rounded-2xl border border-white/10">
+            <h1 class="text-3xl font-bold text-white">10xCards.ai</h1>
+            <AuthButtons isLoggedIn={true} client:load />
+          </div>
+          <div class="p-8 bg-white/10 backdrop-blur-xl rounded-2xl border border-white/10">
+            <h2 class="text-2xl font-bold text-white mb-6">Generuj fiszki</h2>
+            <p class="text-white/80 mb-4">Tutaj będzie główna funkcjonalność generowania fiszek</p>
+          </div>
+        </div>
+      </div>
+    ) : (
+      <div class="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-blue-900 p-4">
+        <div class="max-w-4xl mx-auto">
+          <div class="flex justify-between items-center mb-8 p-6 bg-white/10 backdrop-blur-xl rounded-2xl border border-white/10">
+            <h1 class="text-3xl font-bold text-white">10xCards.ai</h1>
+            <AuthButtons isLoggedIn={false} client:load />
+          </div>
+          <Welcome />
+        </div>
+      </div>
+    )
+  }
 </Layout>
