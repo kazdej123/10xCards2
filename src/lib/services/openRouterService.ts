@@ -1,12 +1,10 @@
-import {
-  ApiResponse,
-  ModelParameters,
-  OpenRouterAuthError,
-  OpenRouterConfig,
-  OpenRouterError,
-  OpenRouterRateLimitError,
-  RequestPayload,
-} from "./openRouterTypes";
+import type { ApiResponse, ModelParameters, OpenRouterConfig, RequestPayload } from "./openRouterTypes";
+
+import { OpenRouterAuthError, OpenRouterError, OpenRouterRateLimitError } from "./openRouterTypes";
+
+import { apiResponseSchema, configSchema, requestPayloadSchema } from "./openRouterSchemas";
+
+import { OpenRouterLogger } from "./openRouterLogger";
 
 // Types
 export interface ModelParameters {
@@ -81,38 +79,52 @@ export class OpenRouterService {
   private currentResponseFormat?: Record<string, unknown>;
   private currentModelName: string;
   private currentModelParameters: ModelParameters;
+  private readonly logger: OpenRouterLogger;
 
   constructor(config: OpenRouterConfig) {
-    // Validate config
-    if (!config.apiKey) {
-      throw new OpenRouterError("API key is required");
-    }
+    this.logger = OpenRouterLogger.getInstance();
 
-    // Initialize configuration
-    this.apiKey = config.apiKey;
-    this.apiUrl = config.apiUrl ?? "https://openrouter.ai/api/v1";
-    this.timeout = config.timeout ?? 30000;
-    this.retries = config.retries ?? 3;
-    this.currentModelName = config.defaultModel ?? "openai/gpt-3.5-turbo";
-    this.currentModelParameters = config.defaultModelParameters ?? {
-      temperature: 0.7,
-      top_p: 1,
-      frequency_penalty: 0,
-      presence_penalty: 0,
-    };
+    try {
+      // Validate config using Zod
+      const validatedConfig = configSchema.parse(config);
+
+      // Initialize configuration
+      this.apiKey = validatedConfig.apiKey;
+      this.apiUrl = validatedConfig.apiUrl ?? "https://openrouter.ai/api/v1";
+      this.timeout = validatedConfig.timeout ?? 30000;
+      this.retries = validatedConfig.retries ?? 3;
+      this.currentModelName = validatedConfig.defaultModel ?? "openai/gpt-3.5-turbo";
+      this.currentModelParameters = validatedConfig.defaultModelParameters ?? {
+        temperature: 0.7,
+        top_p: 1,
+        frequency_penalty: 0,
+        presence_penalty: 0,
+      };
+
+      this.logger.info("OpenRouter service initialized", {
+        apiUrl: this.apiUrl,
+        model: this.currentModelName,
+      });
+    } catch (error) {
+      this.logger.error("Failed to initialize OpenRouter service", error);
+      throw error;
+    }
   }
 
   // Public methods for configuration
   public setSystemMessage(message: string): void {
     this.currentSystemMessage = message;
+    this.logger.debug("System message set", { length: message.length });
   }
 
   public setUserMessage(message: string): void {
     this.currentUserMessage = message;
+    this.logger.debug("User message set", { length: message.length });
   }
 
   public setResponseFormat(schema: Record<string, unknown>): void {
     this.currentResponseFormat = schema;
+    this.logger.debug("Response format set", { schema });
   }
 
   public setModel(name: string, parameters?: ModelParameters): void {
@@ -123,24 +135,37 @@ export class OpenRouterService {
         ...parameters,
       };
     }
+    this.logger.debug("Model configuration updated", {
+      model: name,
+      parameters: this.currentModelParameters,
+    });
   }
 
   // Public method for sending messages
   public async sendChatMessage(userMessage?: string): Promise<ApiResponse> {
-    // Set user message if provided
-    if (userMessage) {
-      this.setUserMessage(userMessage);
-    }
-
-    // Validate required messages
-    if (!this.currentUserMessage) {
-      throw new OpenRouterError("User message is required");
-    }
-
     try {
+      // Set user message if provided
+      if (userMessage) {
+        this.setUserMessage(userMessage);
+      }
+
+      // Validate required messages
+      if (!this.currentUserMessage) {
+        throw new OpenRouterError("User message is required");
+      }
+
       const payload = this.buildRequestPayload();
-      return await this.executeRequest(payload);
+      this.logger.logRequest(payload);
+
+      const response = await this.executeRequest(payload);
+      this.logger.info("Chat message sent successfully", {
+        model: this.currentModelName,
+        choices: response.choices.length,
+      });
+
+      return response;
     } catch (error) {
+      this.logger.error("Failed to send chat message", error);
       // Rethrow OpenRouterError instances
       if (error instanceof OpenRouterError) {
         throw error;
@@ -152,37 +177,43 @@ export class OpenRouterService {
 
   // Private methods
   private buildRequestPayload(): RequestPayload {
-    const messages = [];
+    try {
+      const messages = [];
 
-    // Add system message if present
-    if (this.currentSystemMessage) {
+      // Add system message if present
+      if (this.currentSystemMessage) {
+        messages.push({
+          role: "system" as const,
+          content: this.currentSystemMessage,
+        });
+      }
+
+      // Add user message
       messages.push({
-        role: "system" as const,
-        content: this.currentSystemMessage,
+        role: "user" as const,
+        content: this.currentUserMessage!,
       });
-    }
 
-    // Add user message
-    messages.push({
-      role: "user" as const,
-      content: this.currentUserMessage!,
-    });
-
-    const payload: RequestPayload = {
-      messages,
-      model: this.currentModelName,
-      ...this.currentModelParameters,
-    };
-
-    // Add response format if present
-    if (this.currentResponseFormat) {
-      payload.response_format = {
-        type: "json_object",
-        schema: this.currentResponseFormat,
+      const payload: RequestPayload = {
+        messages,
+        model: this.currentModelName,
+        ...this.currentModelParameters,
       };
-    }
 
-    return payload;
+      // Add response format if present
+      if (this.currentResponseFormat) {
+        payload.response_format = {
+          type: "json_object",
+          schema: this.currentResponseFormat,
+        };
+      }
+
+      // Validate payload using Zod
+      return requestPayloadSchema.parse(payload);
+    } catch (error) {
+      this.logger.error("Failed to build request payload", error);
+      throw error;
+    }
   }
 
   private async executeRequest(payload: RequestPayload): Promise<ApiResponse> {
@@ -190,6 +221,10 @@ export class OpenRouterService {
 
     for (let attempt = 1; attempt <= this.retries; attempt++) {
       try {
+        if (attempt > 1) {
+          this.logger.info(`Retrying request (attempt ${attempt}/${this.retries})`);
+        }
+
         const response = await fetch(`${this.apiUrl}/chat/completions`, {
           method: "POST",
           headers: {
@@ -215,9 +250,11 @@ export class OpenRouterService {
         }
 
         const data = await response.json();
-        return data as ApiResponse;
+        // Validate response using Zod
+        return apiResponseSchema.parse(data);
       } catch (error) {
         lastError = error as Error;
+        this.logger.error(`Request attempt ${attempt} failed`, error);
 
         // Don't retry on auth errors or rate limits
         if (error instanceof OpenRouterAuthError || error instanceof OpenRouterRateLimitError) {
