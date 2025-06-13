@@ -21,9 +21,8 @@ export function AuthButtons({ isLoggedIn, onLogout }: AuthButtonsProps) {
   return (
     <div className="flex gap-3">
       <Button
-        variant="outline"
         asChild
-        className="border-white/30 text-white hover:bg-white/10 hover:border-white/50 transition-all duration-200"
+        className="bg-white/10 border border-white/30 text-white hover:bg-white/20 hover:border-white/50 transition-all duration-200 backdrop-blur-sm"
       >
         <a href="/login">Logowanie</a>
       </Button>

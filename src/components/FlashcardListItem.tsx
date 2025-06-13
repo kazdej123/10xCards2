@@ -190,7 +190,7 @@ export function FlashcardListItem({ flashcard, onAccept, onEdit, onReject }: Fla
                 size="sm"
                 onClick={() => onReject(flashcard.id)}
                 aria-label="Odrzuć fiszkę"
-                className="border-red-400/50 text-red-200 hover:bg-red-500/20 hover:border-red-400/70"
+                className="bg-red-500/20 border-red-400/60 text-red-100 hover:bg-red-500/30 hover:border-red-400/80 transition-all duration-200"
               >
                 ✕
               </Button>

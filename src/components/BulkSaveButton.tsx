@@ -21,11 +21,10 @@ export function BulkSaveButton({
   return (
     <div className="flex justify-end gap-3 pt-6 border-t border-white/20">
       <Button
-        variant="outline"
         onClick={onSaveAccepted}
         disabled={disabled || isLoading || acceptedCount === 0}
         aria-label={`Zapisz ${acceptedCount} zaakceptowane fiszki`}
-        className="border-white/30 text-white hover:bg-white/10 hover:border-white/50 transition-all duration-200"
+        className="bg-white/10 border border-white/30 text-white hover:bg-white/20 hover:border-white/50 transition-all duration-200 backdrop-blur-sm"
       >
         {isLoading ? (
           <>
