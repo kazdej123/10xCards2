@@ -119,6 +119,13 @@ ID: US-009
 Tytuł: Bezpieczny dostęp i autoryzacja
 Opis: Jako zalogowany użytkownik chcę mieć pewność, że moje fiszki nie są dostępne dla innych użytkowników, aby zachować prywatność i bezpieczeństwo danych.
 Kryteria akceptacji:
+- Rejestracja i logowanie odbywają się na dedykowanych stronach.
+- Rejestracja wymaga podania adresu email, hasła i potwierdzenia hasła.
+- Logowanie wymaga podania adresu email i hasła.
+- Użytkownik może logować się do systemu poprzez przycisk w prawym górnym rogu.
+- Użytkownik może się wylogować z systemu poprzez przycisk w prawym górnym rogu w głównym @Layout.astro.
+- Nie korzystamy z zewnętrznych serwisów logowania (np. Google, GitHub).
+- Odzyskiwanie hasła powinno być możliwe.
 - Tylko zalogowany użytkownik może wyświetlać, edytować i usuwać swoje fiszki.
 - Nie ma dostępu do fiszek innych użytkowników ani możliwości współdzielenia.
 
