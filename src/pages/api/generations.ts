@@ -15,6 +15,21 @@ const generateFlashcardsSchema = z.object({
 
 export const POST: APIRoute = async ({ request, locals }) => {
   try {
+    // Check if OpenRouter API key is configured
+    const openRouterApiKey = import.meta.env.OPENROUTER_API_KEY;
+    if (!openRouterApiKey) {
+      return new Response(
+        JSON.stringify({
+          error: "Service configuration error",
+          message: "AI service is not properly configured",
+        }),
+        {
+          status: 503,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
+
     // 1. Parse and validate input
     const body = (await request.json()) as GenerateFlashcardsCommand;
     const result = generateFlashcardsSchema.safeParse(body);
@@ -33,7 +48,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     }
 
     // 2. Generate flashcards using service
-    const generationService = new GenerationService(locals.supabase);
+    const generationService = new GenerationService(locals.supabase, openRouterApiKey);
     const response = await generationService.generateFlashcards(result.data.source_text);
 
     return new Response(JSON.stringify(response), {
@@ -45,11 +60,29 @@ export const POST: APIRoute = async ({ request, locals }) => {
     const errorMessage = error instanceof Error ? error.message : String(error);
 
     // Check if it's an AI service error (should return 503)
-    if (errorMessage.includes("AI service") || errorMessage.includes("timeout")) {
+    if (
+      errorMessage.includes("AI service") ||
+      errorMessage.includes("timeout") ||
+      errorMessage.includes("Failed to generate flashcards")
+    ) {
       return new Response(
         JSON.stringify({
           error: "Service temporarily unavailable",
           message: "AI service is currently unavailable. Please try again later.",
+        }),
+        {
+          status: 503,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
+
+    // Check for authentication errors
+    if (errorMessage.includes("Invalid API key") || errorMessage.includes("401")) {
+      return new Response(
+        JSON.stringify({
+          error: "Service configuration error",
+          message: "AI service authentication failed",
         }),
         {
           status: 503,

@@ -12,10 +12,15 @@ export interface RequestPayload extends ModelParameters {
     content: string;
   }[];
   model: string;
-  response_format?: {
-    type: "json_object";
-    schema: Record<string, unknown>;
-  };
+  response_format?:
+    | {
+        type: "json_object";
+        schema: Record<string, unknown>;
+      }
+    | {
+        type: "json_schema";
+        json_schema: Record<string, unknown>;
+      };
 }
 
 export interface ApiResponse {

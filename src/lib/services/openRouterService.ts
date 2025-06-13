@@ -191,10 +191,19 @@ export class OpenRouterService {
 
       // Add response format if present
       if (this.currentResponseFormat) {
-        payload.response_format = {
-          type: "json_object",
-          schema: this.currentResponseFormat,
-        };
+        // Check if the schema already has the OpenRouter format (name + schema)
+        if (this.currentResponseFormat.name && this.currentResponseFormat.schema) {
+          payload.response_format = {
+            type: "json_schema",
+            json_schema: this.currentResponseFormat,
+          };
+        } else {
+          // Legacy format - wrap in json_object
+          payload.response_format = {
+            type: "json_object",
+            schema: this.currentResponseFormat,
+          };
+        }
       }
 
       return payload;
