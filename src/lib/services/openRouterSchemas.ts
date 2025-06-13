@@ -16,10 +16,16 @@ export const requestPayloadSchema = modelParametersSchema.extend({
   messages: z.array(messageSchema).min(1),
   model: z.string().min(1),
   response_format: z
-    .object({
-      type: z.literal("json_object"),
-      schema: z.record(z.unknown()),
-    })
+    .union([
+      z.object({
+        type: z.literal("json_object"),
+        schema: z.record(z.unknown()),
+      }),
+      z.object({
+        type: z.literal("json_schema"),
+        json_schema: z.record(z.unknown()),
+      }),
+    ])
     .optional(),
 });
 

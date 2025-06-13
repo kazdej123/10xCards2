@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "../../db/supabase.client";
 import type { FlashcardProposalDto, GenerationCreateResponseDto } from "../../types";
-import { DEFAULT_USER_ID } from "@/db/supabase.client";
+import { DEFAULT_USER_ID } from "../../db/supabase.client";
 import { OpenRouterService } from "./openRouterService";
 import crypto from "crypto";
 
