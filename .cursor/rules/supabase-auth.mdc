@@ -26,7 +26,7 @@ npm install @supabase/ssr @supabase/supabase-js
 
 ## Environment Variables
 
-Use `.env` file with required Supabase credentials or create new (based on the snippet below or `.env.example` in project root) if not exists.
+Create `.env` file with required Supabase credentials (based on the snippet below or `.env.example` in project root)
 
 ```env
 SUPABASE_URL=your_project_url
@@ -48,7 +48,7 @@ interface ImportMeta {
 ```
 When introducing new env variables or values stored on Astro.locals, always update `src/env.d.ts` to reflect these changes.
 
-Make sure `.env` is updated with the correct environment variables.
+Make sure `.env.example` is updated with the correct environment variables.
 
 ## Implementation Steps
 
