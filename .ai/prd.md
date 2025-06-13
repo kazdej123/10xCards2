@@ -19,7 +19,9 @@ Manualne tworzenie wysokiej jakości fiszek wymaga dużych nakładów czasu i wy
    - Ręczne tworzenie i wyświetlanie w ramach widoku listy "Moje fiszki"
 
 3. Podstawowy system uwierzytelniania i kont użytkowników:
-   - Rejestracja i logowanie.
+   - Rejestracja i logowanie z wykorzystaniem adresu email i hasła.
+   - Odzyskiwanie i resetowanie hasła.
+   - Nie korzystamy z zewnętrznych serwisów logowania (np. Google, GitHub).
    - Możliwość usunięcia konta i powiązanych fiszek na życzenie.
 
 4. Integracja z algorytmem powtórek:
@@ -53,7 +55,7 @@ ID: US-001
 Tytuł: Rejestracja konta
 Opis: Jako nowy użytkownik chcę się zarejestrować, aby mieć dostęp do własnych fiszek i móc korzystać z generowania fiszek przez AI.
 Kryteria akceptacji:
-- Formularz rejestracyjny zawiera pola na adres e-mail i hasło.
+- Formularz rejestracyjny zawiera pola na adres e-mail, hasło i potwierdzenie hasła.
 - Po poprawnym wypełnieniu formularza i weryfikacji danych konto jest aktywowane.
 - Użytkownik otrzymuje potwierdzenie pomyślnej rejestracji i zostaje zalogowany.
 
@@ -61,9 +63,21 @@ ID: US-002
 Tytuł: Logowanie do aplikacji
 Opis: Jako zarejestrowany użytkownik chcę móc się zalogować, aby mieć dostęp do moich fiszek i historii generowania.
 Kryteria akceptacji:
+- Formularz logowania zawiera pola na adres e-mail i hasło.
 - Po podaniu prawidłowych danych logowania użytkownik zostaje przekierowany do widoku generowania fiszek.
 - Błędne dane logowania wyświetlają komunikat o nieprawidłowych danych.
 - Dane dotyczące logowania przechowywane są w bezpieczny sposób.
+
+ID: US-002B
+Tytuł: Odzyskiwanie hasła
+Opis: Jako użytkownik, który zapomniał hasła, chcę móc je odzyskać/zresetować, aby ponownie uzyskać dostęp do aplikacji.
+Kryteria akceptacji:
+- W formularzu logowania znajduje się link "Zapomniałem hasła".
+- Po kliknięciu link przekierowuje do formularza resetowania hasła.
+- Formularz resetowania hasła zawiera pole na adres e-mail.
+- Po podaniu adresu e-mail użytkownik otrzymuje link do resetowania hasła.
+- Link do resetowania hasła jest ważny przez ograniczony czas (np. 24 godziny).
+- Po kliknięciu w link użytkownik może ustawić nowe hasło.
 
 ID: US-003
 Tytuł: Generowanie fiszek przy użyciu AI
