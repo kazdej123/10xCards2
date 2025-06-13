@@ -55,7 +55,7 @@ export class Logger {
     this.logs.push(entry);
 
     // Log to console in development
-    if (import.meta.env.DEV) {
+    if (process.env.NODE_ENV === "development") {
       // eslint-disable-next-line no-console
       console.log(`[${this.context}][${entry.level.toUpperCase()}] ${entry.message}`, entry.data || "");
     }

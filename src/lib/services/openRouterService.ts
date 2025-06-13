@@ -2,15 +2,16 @@ import type { ApiResponse, ModelParameters, RequestPayload } from "./openRouterT
 
 import { OpenRouterAuthError, OpenRouterError } from "./openRouterTypes";
 
-import { requestPayloadSchema } from "./openRouterSchemas";
+import { requestPayloadSchema, configSchema } from "./openRouterSchemas";
 
 import { Logger } from "./openRouterLogger";
 
 export class OpenRouterService {
+  public readonly apiUrl: string;
+  public readonly defaultTimeout: number;
+  public readonly maxRetries: number;
+
   private readonly apiKey: string;
-  private readonly apiUrl: string;
-  private readonly defaultTimeout: number;
-  private readonly maxRetries: number;
   private readonly logger: Logger;
 
   private currentSystemMessage = "";
@@ -24,19 +25,17 @@ export class OpenRouterService {
     presence_penalty: 0,
   };
 
-  constructor(config: { apiKey: string; apiUrl?: string; timeout?: number; maxRetries?: number }) {
+  constructor(config: { apiKey: string; apiUrl?: string; timeout?: number; retries?: number }) {
     this.logger = new Logger("OpenRouterService");
 
     try {
-      // Validate required configuration
-      if (!config.apiKey) {
-        throw new OpenRouterError("API key is required", "MISSING_API_KEY");
-      }
+      // Validate configuration using Zod
+      const validatedConfig = configSchema.parse(config);
 
-      this.apiKey = config.apiKey;
-      this.apiUrl = config.apiUrl || "https://openrouter.ai/api/v1";
-      this.defaultTimeout = config.timeout || 30000;
-      this.maxRetries = config.maxRetries || 3;
+      this.apiKey = validatedConfig.apiKey;
+      this.apiUrl = validatedConfig.apiUrl || "https://openrouter.ai/api/v1";
+      this.defaultTimeout = validatedConfig.timeout || 30000;
+      this.maxRetries = validatedConfig.retries || 3;
 
       this.logger.info("OpenRouter service initialized", {
         apiUrl: this.apiUrl,
@@ -127,10 +126,21 @@ export class OpenRouterService {
 
   /**
    * Sends a chat message to the OpenRouter API and returns the response
+   * @param userMessage Optional user message to send. If provided, overwrites previously set user message.
    * @throws {OpenRouterError} If the request fails or validation fails
    */
-  public async sendChatMessage(): Promise<string> {
+  public async sendChatMessage(userMessage?: string): Promise<ApiResponse> {
     try {
+      // Set user message if provided
+      if (userMessage) {
+        this.setUserMessage(userMessage);
+      }
+
+      // Validate that we have a user message
+      if (!this.currentUserMessage) {
+        throw new OpenRouterError("User message is required", "MISSING_USER_MESSAGE");
+      }
+
       // Build and validate the request payload
       const payload = this.buildRequestPayload();
       requestPayloadSchema.parse(payload);
@@ -143,7 +153,7 @@ export class OpenRouterService {
         choices: response.choices.length,
       });
 
-      return response.choices[0].message.content;
+      return response;
     } catch (error) {
       this.logger.error("Failed to send chat message", error);
       throw error;
