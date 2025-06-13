@@ -34,9 +34,6 @@ Manualne tworzenie wysokiej jakości fiszek wymaga dużych nakładów czasu i wy
 6. Statystyki generowania fiszek:
    - Zbieranie informacji o tym, ile fiszek zostało wygenerowanych przez AI i ile z nich ostatecznie zaakceptowano.
 
-7. Wymagania prawne i ograniczenia:
-   - Dane osobowe użytkowników i fiszek przechowywane zgodnie z RODO.
-   - Prawo do wglądu i usunięcia danych (konto wraz z fiszkami) na wniosek użytkownika.
 
 ## 4. Granice produktu
 1. Poza zakresem MVP:
@@ -56,8 +53,8 @@ Tytuł: Rejestracja konta
 Opis: Jako nowy użytkownik chcę się zarejestrować, aby mieć dostęp do własnych fiszek i móc korzystać z generowania fiszek przez AI.
 Kryteria akceptacji:
 - Formularz rejestracyjny zawiera pola na adres e-mail, hasło i potwierdzenie hasła.
-- Po poprawnym wypełnieniu formularza i weryfikacji danych konto jest aktywowane.
-- Użytkownik otrzymuje potwierdzenie pomyślnej rejestracji i zostaje zalogowany.
+- Po poprawnym wypełnieniu formularza i weryfikacji danych konto jest natychmiast aktywowane bez konieczności weryfikacji email.
+- Użytkownik otrzymuje potwierdzenie pomyślnej rejestracji, zostaje automatycznie zalogowany i przekierowany do widoku generowania fiszek.
 
 ID: US-002
 Tytuł: Logowanie do aplikacji
