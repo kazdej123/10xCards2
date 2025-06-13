@@ -1,42 +1,42 @@
-import type { ApiResponse, ModelParameters, OpenRouterConfig, RequestPayload } from "./openRouterTypes";
+import type { ApiResponse, ModelParameters, RequestPayload } from "./openRouterTypes";
 
-import { OpenRouterAuthError, OpenRouterError, OpenRouterRateLimitError } from "./openRouterTypes";
+import { OpenRouterAuthError, OpenRouterError } from "./openRouterTypes";
 
-import { apiResponseSchema, configSchema, requestPayloadSchema } from "./openRouterSchemas";
+import { requestPayloadSchema } from "./openRouterSchemas";
 
-import { OpenRouterLogger } from "./openRouterLogger";
+import { Logger } from "./openRouterLogger";
 
 export class OpenRouterService {
   private readonly apiKey: string;
   private readonly apiUrl: string;
-  private readonly timeout: number;
-  private readonly retries: number;
-  private currentSystemMessage?: string;
-  private currentUserMessage?: string;
-  private currentResponseFormat?: Record<string, unknown>;
-  private currentModelName: string;
-  private currentModelParameters: ModelParameters;
-  private readonly logger: OpenRouterLogger;
+  private readonly defaultTimeout: number;
+  private readonly maxRetries: number;
+  private readonly logger: Logger;
 
-  constructor(config: OpenRouterConfig) {
-    this.logger = OpenRouterLogger.getInstance();
+  private currentSystemMessage = "";
+  private currentUserMessage = "";
+  private currentResponseFormat?: Record<string, unknown>;
+  private currentModelName = "openai/gpt-4o-mini";
+  private currentModelParameters: ModelParameters = {
+    temperature: 0.7,
+    top_p: 1,
+    frequency_penalty: 0,
+    presence_penalty: 0,
+  };
+
+  constructor(config: { apiKey: string; apiUrl?: string; timeout?: number; maxRetries?: number }) {
+    this.logger = new Logger("OpenRouterService");
 
     try {
-      // Validate config using Zod
-      const validatedConfig = configSchema.parse(config);
+      // Validate required configuration
+      if (!config.apiKey) {
+        throw new OpenRouterError("API key is required", "MISSING_API_KEY");
+      }
 
-      // Initialize configuration
-      this.apiKey = validatedConfig.apiKey;
-      this.apiUrl = validatedConfig.apiUrl ?? "https://openrouter.ai/api/v1";
-      this.timeout = validatedConfig.timeout ?? 30000;
-      this.retries = validatedConfig.retries ?? 3;
-      this.currentModelName = validatedConfig.defaultModel ?? "openai/gpt-3.5-turbo";
-      this.currentModelParameters = validatedConfig.defaultModelParameters ?? {
-        temperature: 0.7,
-        top_p: 1,
-        frequency_penalty: 0,
-        presence_penalty: 0,
-      };
+      this.apiKey = config.apiKey;
+      this.apiUrl = config.apiUrl || "https://openrouter.ai/api/v1";
+      this.defaultTimeout = config.timeout || 30000;
+      this.maxRetries = config.maxRetries || 3;
 
       this.logger.info("OpenRouter service initialized", {
         apiUrl: this.apiUrl,
@@ -48,71 +48,111 @@ export class OpenRouterService {
     }
   }
 
-  // Public methods for configuration
+  /**
+   * Sets the system message that provides context for the model
+   */
   public setSystemMessage(message: string): void {
-    this.currentSystemMessage = message;
-    this.logger.debug("System message set", { length: message.length });
-  }
-
-  public setUserMessage(message: string): void {
-    this.currentUserMessage = message;
-    this.logger.debug("User message set", { length: message.length });
-  }
-
-  public setResponseFormat(schema: Record<string, unknown>): void {
-    this.currentResponseFormat = schema;
-    this.logger.debug("Response format set", { schema });
-  }
-
-  public setModel(name: string, parameters?: ModelParameters): void {
-    this.currentModelName = name;
-    if (parameters) {
-      this.currentModelParameters = {
-        ...this.currentModelParameters,
-        ...parameters,
-      };
-    }
-    this.logger.debug("Model configuration updated", {
-      model: name,
-      parameters: this.currentModelParameters,
-    });
-  }
-
-  // Public method for sending messages
-  public async sendChatMessage(userMessage?: string): Promise<ApiResponse> {
     try {
-      // Set user message if provided
-      if (userMessage) {
-        this.setUserMessage(userMessage);
+      if (!message.trim()) {
+        throw new OpenRouterError("System message cannot be empty", "INVALID_SYSTEM_MESSAGE");
       }
 
-      // Validate required messages
-      if (!this.currentUserMessage) {
-        throw new OpenRouterError("User message is required");
+      this.currentSystemMessage = message;
+      this.logger.debug("System message set", { messageLength: message.length });
+    } catch (error) {
+      this.logger.error("Failed to set system message", { error, messageLength: message.length });
+      throw error;
+    }
+  }
+
+  /**
+   * Sets the user message for the chat request
+   */
+  public setUserMessage(message: string): void {
+    try {
+      if (!message.trim()) {
+        throw new OpenRouterError("User message cannot be empty", "INVALID_USER_MESSAGE");
       }
 
+      this.currentUserMessage = message;
+      this.logger.debug("User message set", { messageLength: message.length });
+    } catch (error) {
+      this.logger.error("Failed to set user message", { error, messageLength: message.length });
+      throw error;
+    }
+  }
+
+  /**
+   * Sets the JSON schema for structured responses
+   */
+  public setResponseFormat(schema: Record<string, unknown>): void {
+    try {
+      // Validate that the schema is a valid JSON object
+      JSON.stringify(schema);
+
+      this.currentResponseFormat = schema;
+      this.logger.debug("Response format set", { schemaKeys: Object.keys(schema) });
+    } catch (error) {
+      this.logger.error("Failed to set response format", { error, schemaKeys: Object.keys(schema) });
+      throw new OpenRouterError("Invalid JSON schema provided", "INVALID_RESPONSE_FORMAT");
+    }
+  }
+
+  /**
+   * Sets the model and its parameters
+   */
+  public setModel(name: string, parameters?: ModelParameters): void {
+    try {
+      if (!name.trim()) {
+        throw new OpenRouterError("Model name cannot be empty", "INVALID_MODEL_NAME");
+      }
+
+      this.currentModelName = name;
+      if (parameters) {
+        this.currentModelParameters = {
+          ...this.currentModelParameters,
+          ...parameters,
+        };
+      }
+
+      this.logger.debug("Model configuration updated", {
+        model: name,
+        parameters: this.currentModelParameters,
+      });
+    } catch (error) {
+      this.logger.error("Failed to set model", { error, model: name, parameters });
+      throw error;
+    }
+  }
+
+  /**
+   * Sends a chat message to the OpenRouter API and returns the response
+   * @throws {OpenRouterError} If the request fails or validation fails
+   */
+  public async sendChatMessage(): Promise<string> {
+    try {
+      // Build and validate the request payload
       const payload = this.buildRequestPayload();
-      this.logger.logRequest(payload);
+      requestPayloadSchema.parse(payload);
 
+      // Execute the request
       const response = await this.executeRequest(payload);
+
       this.logger.info("Chat message sent successfully", {
         model: this.currentModelName,
         choices: response.choices.length,
       });
 
-      return response;
+      return response.choices[0].message.content;
     } catch (error) {
       this.logger.error("Failed to send chat message", error);
-      // Rethrow OpenRouterError instances
-      if (error instanceof OpenRouterError) {
-        throw error;
-      }
-      // Wrap unknown errors
-      throw new OpenRouterError("Failed to send chat message", error);
+      throw error;
     }
   }
 
-  // Private methods
+  /**
+   * Builds the request payload for the OpenRouter API
+   */
   private buildRequestPayload(): RequestPayload {
     try {
       const messages = [];
@@ -147,71 +187,62 @@ export class OpenRouterService {
         };
       }
 
-      // Validate payload using Zod
-      return requestPayloadSchema.parse(payload);
+      return payload;
     } catch (error) {
       this.logger.error("Failed to build request payload", error);
       throw error;
     }
   }
 
-  private async executeRequest(payload: RequestPayload): Promise<ApiResponse> {
-    let lastError: Error | undefined;
+  /**
+   * Executes a request to the OpenRouter API with retry logic
+   */
+  private async executeRequest(requestPayload: RequestPayload): Promise<ApiResponse> {
+    let lastError: Error | null = null;
+    let attempt = 0;
 
-    for (let attempt = 1; attempt <= this.retries; attempt++) {
+    while (attempt < this.maxRetries) {
       try {
-        if (attempt > 1) {
-          this.logger.info(`Retrying request (attempt ${attempt}/${this.retries})`);
-        }
-
         const response = await fetch(`${this.apiUrl}/chat/completions`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${this.apiKey}`,
           },
-          body: JSON.stringify(payload),
-          signal: AbortSignal.timeout(this.timeout),
+          body: JSON.stringify(requestPayload),
+          signal: AbortSignal.timeout(this.defaultTimeout),
         });
 
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}));
 
           // Handle specific error cases
-          switch (response.status) {
-            case 401:
-              throw new OpenRouterAuthError("Invalid API key");
-            case 429:
-              throw new OpenRouterRateLimitError("Rate limit exceeded");
-            default:
-              throw new OpenRouterError(`API request failed: ${response.statusText}`, errorData);
+          if (response.status === 401 || response.status === 400) {
+            throw new OpenRouterAuthError("Invalid API key", "API_ERROR", response.status);
           }
+
+          throw new OpenRouterError(errorData.message || "HTTP error " + response.status, "API_ERROR", response.status);
         }
 
         const data = await response.json();
-        // Validate response using Zod
-        return apiResponseSchema.parse(data);
+        return data as ApiResponse;
       } catch (error) {
         lastError = error as Error;
-        this.logger.error(`Request attempt ${attempt} failed`, error);
+        this.logger.error(`Request attempt ${attempt + 1} failed`, error);
 
-        // Don't retry on auth errors or rate limits
-        if (error instanceof OpenRouterAuthError || error instanceof OpenRouterRateLimitError) {
+        // Don't retry on authentication errors or invalid requests
+        if (error instanceof OpenRouterAuthError && (error.status === 401 || error.status === 400)) {
           throw error;
         }
 
-        // If this was the last attempt, throw the error
-        if (attempt === this.retries) {
-          throw new OpenRouterError(`Failed to execute request after ${this.retries} attempts`, lastError);
-        }
+        // Exponential backoff
+        const delay = Math.min(1000 * Math.pow(2, attempt), 8000);
+        await new Promise((resolve) => setTimeout(resolve, delay));
 
-        // Wait before retrying (exponential backoff)
-        const backoffMs = Math.min(1000 * Math.pow(2, attempt - 1), 10000);
-        await new Promise((resolve) => setTimeout(resolve, backoffMs));
+        attempt++;
       }
     }
 
-    // This should never happen due to the loop above
-    throw new OpenRouterError("Unexpected error in request execution");
+    throw lastError || new OpenRouterError("Maximum retry attempts reached", "MAX_RETRIES_EXCEEDED");
   }
 }

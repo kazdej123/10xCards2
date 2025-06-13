@@ -40,7 +40,8 @@ export interface OpenRouterConfig {
 export class OpenRouterError extends Error {
   constructor(
     message: string,
-    public readonly cause?: unknown
+    public readonly code: string,
+    public readonly status?: number
   ) {
     super(message);
     this.name = "OpenRouterError";
@@ -48,15 +49,15 @@ export class OpenRouterError extends Error {
 }
 
 export class OpenRouterAuthError extends OpenRouterError {
-  constructor(message: string, cause?: unknown) {
-    super(message, cause);
+  constructor(message: string, code = "AUTH_ERROR", status?: number) {
+    super(message, code, status);
     this.name = "OpenRouterAuthError";
   }
 }
 
 export class OpenRouterRateLimitError extends OpenRouterError {
-  constructor(message: string, cause?: unknown) {
-    super(message, cause);
+  constructor(message: string, code = "RATE_LIMIT_ERROR", status?: number) {
+    super(message, code, status);
     this.name = "OpenRouterRateLimitError";
   }
 }

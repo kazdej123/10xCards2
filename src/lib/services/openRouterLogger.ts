@@ -7,18 +7,12 @@ export interface LogEntry {
   data?: unknown;
 }
 
-export class OpenRouterLogger {
-  private static instance: OpenRouterLogger;
+export class Logger {
   private logs: LogEntry[] = [];
+  private context: string;
 
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  private constructor() {}
-
-  public static getInstance(): OpenRouterLogger {
-    if (!OpenRouterLogger.instance) {
-      OpenRouterLogger.instance = new OpenRouterLogger();
-    }
-    return OpenRouterLogger.instance;
+  constructor(context: string) {
+    this.context = context;
   }
 
   public info(message: string, data?: unknown): void {
@@ -63,7 +57,7 @@ export class OpenRouterLogger {
     // Log to console in development
     if (import.meta.env.DEV) {
       // eslint-disable-next-line no-console
-      console.log(`[OpenRouter][${entry.level.toUpperCase()}] ${entry.message}`, entry.data || "");
+      console.log(`[${this.context}][${entry.level.toUpperCase()}] ${entry.message}`, entry.data || "");
     }
   }
 
