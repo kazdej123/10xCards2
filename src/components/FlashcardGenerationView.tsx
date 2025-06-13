@@ -152,7 +152,7 @@ export function FlashcardGenerationView() {
       </div>
 
       {errorMessage && (
-        <div className="bg-destructive/15 text-destructive px-4 py-3 rounded-md border border-destructive/20">
+        <div className="bg-red-500/20 text-red-200 px-4 py-3 rounded-lg border border-red-500/30 backdrop-blur-sm">
           {errorMessage}
         </div>
       )}
