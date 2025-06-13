@@ -120,5 +120,9 @@ const loginSchema = z.object({
 - **Walidacja**: server-side walidacja wszystkich inputów
 - **Error handling**: spójne komunikaty błędów bez ujawniania szczegółów technicznych
 
-
-**Tech stack**: Astro 5, React 19, TypeScript 5, Tailwind 4, Supabase Auth, Zustand
+## 5. PODSUMOWANIE
+- **Frontend**: Astro 5 + React 19 z komponentami autoryzacyjnymi
+- **Backend**: Endpointy API w Astro z walidacją Zod
+- **Autentykacja**: Supabase Auth jako gotowe rozwiązanie
+- **Stan globalny**: Zustand dla prostego zarządzania stanem użytkownika
+- **Bezpieczeństwo**: Row Level Security (RLS) w Supabase
