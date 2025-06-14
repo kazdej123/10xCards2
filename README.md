@@ -1,4 +1,4 @@
-# 10x-cards
+# 10x-cards2
 
 A web application to quickly create and manage educational flashcard sets using AI-powered suggestions.
 
