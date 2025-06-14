@@ -137,7 +137,7 @@ Projekt wykorzystuje GitHub Actions do automatyzacji testów i buildów. Pipelin
    - Generowanie raportów coverage
 
 3. **E2E Tests** - Testy end-to-end
-   - Playwright (testy w przeglądarce Chromium)
+   - Playwright (testy  w przeglądarce Chromium)
 
 4. **Production Build** - Build produkcyjny
    - Astro build (generowanie statycznych plików)
