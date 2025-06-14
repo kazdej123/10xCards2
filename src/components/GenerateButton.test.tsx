@@ -1,10 +1,10 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { GenerateButton } from "./GenerateButton";
-import { axe, toHaveNoViolations } from "jest-axe";
+import { axe } from "jest-axe";
 
-// Extend expect with axe matchers
-expect.extend(toHaveNoViolations);
+// Import and extend jest-axe matchers for Vitest
+import "jest-axe/extend-expect";
 
 describe("GenerateButton", () => {
   const defaultProps = {
