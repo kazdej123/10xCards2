@@ -1,4 +1,4 @@
-import { Page, expect, Locator } from "@playwright/test";
+import { expect, type Page } from "@playwright/test";
 
 /**
  * Test utilities and helper functions

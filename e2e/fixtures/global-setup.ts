@@ -1,10 +1,9 @@
-import { FullConfig } from "@playwright/test";
-
 /**
  * Global setup that runs before all tests
  * Useful for database seeding, authentication, etc.
  */
-async function globalSetup(config: FullConfig) {
+async function globalSetup() {
+  // eslint-disable-next-line no-console
   console.log("🔧 Running global setup...");
 
   // Here you can add:
@@ -13,6 +12,7 @@ async function globalSetup(config: FullConfig) {
   // - Environment preparation
   // - API calls for test data preparation
 
+  // eslint-disable-next-line no-console
   console.log("✅ Global setup completed");
 }
 

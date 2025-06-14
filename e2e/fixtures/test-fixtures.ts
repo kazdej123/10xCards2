@@ -1,4 +1,5 @@
-import { test as base, Page } from "@playwright/test";
+/* eslint-disable react-hooks/rules-of-hooks */
+import { test as base, type Page } from "@playwright/test";
 import { HomePage } from "../page-objects/home-page";
 
 /**
@@ -10,12 +11,14 @@ export const test = base.extend<{
   authenticatedPage: Page;
 }>({
   // Page Object fixtures
+
   homePage: async ({ page }, use) => {
     const homePage = new HomePage(page);
     await use(homePage);
   },
 
   // Example: Authenticated page fixture
+
   authenticatedPage: async ({ browser }, use) => {
     const context = await browser.newContext();
     const page = await context.newPage();
