@@ -2,7 +2,15 @@ import { defineMiddleware } from "astro:middleware";
 import { createSupabaseServerInstance } from "../db/supabase.client";
 
 // Public paths that don't require authentication
-const PUBLIC_PATHS = ["/", "/login", "/register", "/reset-password", "/api/auth/login", "/api/auth/register"];
+const PUBLIC_PATHS = [
+  "/",
+  "/login",
+  "/register",
+  "/reset-password",
+  "/api/auth/login",
+  "/api/auth/register",
+  "/api/auth/logout",
+];
 
 export const onRequest = defineMiddleware(async ({ locals, cookies, url, request, redirect }, next) => {
   // Skip auth check for public paths
