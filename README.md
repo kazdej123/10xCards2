@@ -11,6 +11,7 @@ A web application to quickly create and manage educational flashcard sets using 
 - [Project Scope](#project-scope)
 - [Project Status](#project-status)
 - [License](#license)
+- [CI/CD Pipeline](#ci-cd-pipeline)
 
 ## Description
 
@@ -113,3 +114,61 @@ Status: **MVP in active development**
 ## License
 
 This project currently has no license. Please add a `LICENSE` file to specify licensing terms.
+
+## CI/CD Pipeline
+
+Projekt wykorzystuje GitHub Actions do automatyzacji testów i buildów. Pipeline CI/CD składa się z następujących etapów:
+
+### Workflow: CI/CD Pipeline (`.github/workflows/ci-cd.yml`)
+
+**Uruchamianie:**
+- Automatycznie przy push do gałęzi `master`
+- Automatycznie przy pull request do gałęzi `master`  
+- Manualnie poprzez GitHub UI (workflow_dispatch)
+
+**Etapy:**
+
+1. **Quality Checks** - Kontrola jakości kodu
+   - ESLint (sprawdzanie jakości kodu)
+   - Prettier (sprawdzanie formatowania)
+
+2. **Unit Tests** - Testy jednostkowe
+   - Vitest (testy jednostkowe)
+   - Generowanie raportów coverage
+
+3. **E2E Tests** - Testy end-to-end
+   - Playwright (testy w przeglądarce Chromium)
+
+4. **Production Build** - Build produkcyjny
+   - Astro build (generowanie statycznych plików)
+   - Uruchamia się tylko po pomyślnym przejściu testów jakości i jednostkowych
+
+5. **Deploy Ready Check** - Potwierdzenie gotowości do wdrożenia
+   - Uruchamia się tylko dla push do `master`
+   - Wykonuje się po pomyślnym przejściu wszystkich wcześniejszych etapów
+
+### Pozostałe workflow
+
+- **Playwright Tests** (`.github/workflows/playwright.yml`) - Dedykowany workflow dla testów E2E
+
+### Konfiguracja środowiska
+
+- Node.js: wersja określona w `.nvmrc` (22.14.0)
+- Cache dependencies: npm (przyspiesza instalację)
+- Artefakty: raporty testów, coverage, build produkcyjny
+
+### Uruchomienie lokalne
+
+```bash
+# Testy jednostkowe
+npm run test:run
+
+# Testy E2E  
+npm run test:e2e
+
+# Linting
+npm run lint
+
+# Build produkcyjny
+npm run build
+```

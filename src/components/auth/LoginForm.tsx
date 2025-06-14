@@ -57,7 +57,7 @@ export function LoginForm() {
         <p className="text-blue-100/90">Wprowadź swoje dane aby się zalogować</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-6" data-testid="login-form">
         <div className="space-y-2">
           <Label htmlFor="email" className="text-blue-100 font-medium">
             Email
@@ -70,6 +70,7 @@ export function LoginForm() {
             required
             className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-400/50 backdrop-blur-sm"
             placeholder="twoj@email.com"
+            data-testid="email-input"
           />
         </div>
 
@@ -85,6 +86,7 @@ export function LoginForm() {
             required
             className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-400/50 backdrop-blur-sm"
             placeholder="••••••••"
+            data-testid="password-input"
           />
         </div>
 
@@ -99,6 +101,7 @@ export function LoginForm() {
             type="submit"
             className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-3 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl"
             disabled={isLoading}
+            data-testid="login-button"
           >
             {isLoading ? "Logowanie..." : "Zaloguj się"}
           </Button>
