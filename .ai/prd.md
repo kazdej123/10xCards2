@@ -24,9 +24,9 @@ Manualne tworzenie wysokiej jakości fiszek wymaga dużych nakładów czasu i wy
    - Nie korzystamy z zewnętrznych serwisów logowania (np. Google, GitHub).
    - Możliwość usunięcia konta i powiązanych fiszek na życzenie.
 
-4. Integracja z algorytmem powtórek:
-   - Zapewnienie mechanizmu przypisywania fiszek do harmonogramu powtórek (korzystanie z gotowego algorytmu).
-   - Brak dodatkowych metadanych i zaawansowanych funkcji powiadomień w MVP.
+4. Przygotowanie do przyszłej integracji:
+   - Struktura danych pozwalająca na przyszłą integrację z algorytmami powtórek.
+   - Brak implementacji sesji nauki w MVP.
 
 5. Przechowywanie i skalowalność:
    - Dane o fiszkach i użytkownikach przechowywane w sposób zapewniający skalowalność i bezpieczeństwo.
@@ -118,15 +118,6 @@ Kryteria akceptacji:
 - Po zapisaniu nowa fiszka pojawia się na liście.
 
 ID: US-008
-Tytuł: Sesja nauki z algorytmem powtórek
-Opis: Jako zalogowany użytkownik chcę, aby dodane fiszki były dostępne w widoku "Sesja nauki" opartym na zewnętrznym algorytmie, aby móc efektywnie się uczyć (spaced repetition).
-Kryteria akceptacji:
-- W widoku "Sesja nauki" algorytm przygotowuje dla mnie sesję nauki fiszek
-- Na start wyświetlany jest przód fiszki, poprzez interakcję użytkownik wyświetla jej tył
-- Użytkownik ocenia zgodnie z oczekiwaniami algorytmu na ile przyswoił fiszkę
-- Następnie algorytm pokazuje kolejną fiszkę w ramach sesji nauki
-
-ID: US-009
 Tytuł: Bezpieczny dostęp i autoryzacja
 Opis: Jako zalogowany użytkownik chcę mieć pewność, że moje fiszki nie są dostępne dla innych użytkowników, aby zachować prywatność i bezpieczeństwo danych.
 Kryteria akceptacji:

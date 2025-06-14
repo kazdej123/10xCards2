@@ -23,13 +23,10 @@ Głównymi celami testowania projektu 10xCards2 są:
 - **Moduł Generacji Fiszek (AI Generation)**:
   - Interfejs wprowadzania tekstu źródłowego
   - Działanie mechanizmu generacji AI
-  - Wizualizacja wybranych elementów i ich liczników
-  - Funkcjonalność wyszukiwania, filtrowania, sortowania i obsługi stanu "brak wyników"
-  - Wyświetlanie wybranych fiszek w sekcji "Generated Flashcards"
-  - Funkcjonalność pojedynczych fiszek z sekcji "Generated Flashcards"
-  - Usuwanie pojedynczych fiszek z sekcji "Generated Flashcards"
-  - Funkcjonalność "Clear All"
-  - Poprawność wyświetlania tłumaczeń (i18n)
+  - Wyświetlanie wygenerowanych propozycji fiszek
+  - Funkcjonalność akceptacji, edycji i odrzucania pojedynczych fiszek
+  - Bulk save wybranych fiszek
+  - Obsługa błędów API i walidacji
   - Dostępność (nawigacja klawiaturą, czytniki ekranu)
 
 - **Moduł Zarządzania Fiszkami (Flashcard Management)**:
@@ -39,9 +36,7 @@ Głównymi celami testowania projektu 10xCards2 są:
   - Usuwanie pojedynczych fiszek (z potwierdzeniem)
   - Wyszukiwanie fiszek po zawartości
   - Sortowanie i filtrowanie fiszek
-  - Organizacja fiszek w proste zestawy/kolekcje
   - Wyświetlanie informacji o konieczności zalogowania dla niezalogowanych użytkowników
-  - Bulk operations - masowe operacje na fiszkach (opcjonalnie)
 
 - **Moduł Autentykacji**:
   - Formularz logowania (walidacja pól, proces logowania przez API, obsługa błędów, przekierowanie)
@@ -104,7 +99,7 @@ Poniżej przedstawiono przykładowe, wysokopoziomowe scenariusze testowe. Szczeg
 - **TC-GEN-05**: Obsługa błędów zewnętrznych (OpenRouter downtime, quota exceeded)
 - **TC-GEN-06**: Filtrowanie i sortowanie wygenerowanych fiszek
 - **TC-GEN-07**: Selekcja pojedynczych fiszek do akceptacji
-- **TC-GEN-08**: Bulk save wybranych fiszek do kolekcji
+- **TC-GEN-08**: Bulk save wybranych fiszek
 
 ### 4.2 Zarządzanie fiszkami:
 
@@ -112,21 +107,9 @@ Poniżej przedstawiono przykładowe, wysokopoziomowe scenariusze testowe. Szczeg
 - **TC-FLASH-02**: Ręczne tworzenie nowej fiszki (formularz przód/tył)
 - **TC-FLASH-03**: Edycja istniejącej fiszki z walidacją formularza
 - **TC-FLASH-04**: Usuwanie pojedynczej fiszki z potwierdzeniem
-- **TC-FLASH-05**: Bulk operations - masowe operacje na fiszkach
-- **TC-FLASH-06**: Wyszukiwanie fiszek po zawartości
-- **TC-FLASH-07**: Organizacja fiszek w kolekcje
+- **TC-FLASH-05**: Wyszukiwanie fiszek po zawartości
 
-### 4.3 Zestawy fiszek (opcjonalnie w MVP):
-
-- **TC-SET-01**: Utworzenie nowego zestawu fiszek (nazwa, opis)
-- **TC-SET-02**: Dodawanie fiszek do zestawu
-- **TC-SET-03**: Usuwanie fiszek z zestawu
-- **TC-SET-04**: Edycja nazwy/opisu zestawu
-- **TC-SET-05**: Usunięcie całego zestawu (z potwierdzeniem)
-- **TC-SET-06**: Wyświetlanie listy zestawów użytkownika
-- **TC-SET-07**: Filtrowanie i sortowanie zestawów
-
-### 4.4 Autentykacja:
+### 4.3 Autentykacja:
 
 - **TC-AUTH-01**: Pomyślne logowanie z poprawnymi danymi
 - **TC-AUTH-02**: Nieudane logowanie z błędnymi danymi (poprawny komunikat błędu)
@@ -139,7 +122,7 @@ Poniżej przedstawiono przykładowe, wysokopoziomowe scenariusze testowe. Szczeg
 - **TC-AUTH-09**: Reset hasła - wysyłka emaila i proces zmiany hasła
 - **TC-AUTH-10**: Weryfikacja Row Level Security w Supabase
 
-### 4.5 Responsywność i cross-browser:
+### 4.4 Responsywność i cross-browser:
 
 - **TC-RESP-01**: Aplikacja działa poprawnie na różnych rozdzielczościach (Mobile, Tablet, Desktop)
 - **TC-RESP-02**: Testowanie w różnych przeglądarkach (Chrome, Firefox, Safari, Edge)
@@ -147,7 +130,7 @@ Poniżej przedstawiono przykładowe, wysokopoziomowe scenariusze testowe. Szczeg
 - **TC-RESP-04**: Navigation i interakcje touch działają na urządzeniach mobilnych
 - **TC-RESP-05**: Performance na urządzeniach o niższej wydajności
 
-### 4.6 API Endpoints:
+### 4.5 API Endpoints:
 
 - **TC-API-01**: `GET /api/flashcards` – autoryzacja, zwracane dane, kody odpowiedzi
 - **TC-API-02**: `POST /api/flashcards` – walidacja payload, wstawianie do DB
@@ -156,7 +139,7 @@ Poniżej przedstawiono przykładowe, wysokopoziomowe scenariusze testowe. Szczeg
 - **TC-API-05**: Rate limiting i throttling API endpoints
 - **TC-API-06**: Error handling i response codes
 
-### 4.7 Metryki i analityka:
+### 4.6 Metryki i analityka:
 
 - **TC-METR-01**: Śledzenie współczynnika akceptacji AI-generowanych fiszek (cel: 75%)
 - **TC-METR-02**: Zliczanie stosunku fiszek AI vs. ręcznych (cel: 75% AI)
@@ -182,7 +165,6 @@ Poniżej przedstawiono przykładowe, wysokopoziomowe scenariusze testowe. Szczeg
 
 ### Dane testowe:
 - Konta użytkowników testowych
-- Przykładowe zestawy fiszek
 - Przykładowe teksty do generacji fiszek (różne długości, języki, złożoność)
 - Przykładowe fiszki utworzone ręcznie i przez AI
 
@@ -191,11 +173,9 @@ Poniżej przedstawiono przykładowe, wysokopoziomowe scenariusze testowe. Szczeg
 - **Vitest** + **React Testing Library** (testy jednostkowe)
 - **Playwright** (testy E2E) 
 - **MSW (Mock Service Worker)** (mockowanie API)
-- **Supertest** (automatyczne testy API)
-- **Artillery** + **Lighthouse** (wydajność)
-- **Chromatic/Percy** (visual regression)
-- **axe-core** + **Lighthouse** (dostępność)
-- **ESLint**, **Prettier**, **TailwindCSS Linter**
+- **Lighthouse** (wydajność i dostępność)
+- **axe-core** (dostępność)
+- **ESLint**, **Prettier** (jakość kodu)
 - **Sentry** (monitoring błędów)
 - **Supabase CLI** (emulator lokalny)
 

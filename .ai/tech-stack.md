@@ -15,6 +15,19 @@ AI - Komunikacja z modelami przez usługę Openrouter.ai:
 - Dostęp do szerokiej gamy modeli (OpenAI, Anthropic, Google i wiele innych), które pozwolą nam znaleźć rozwiązanie zapewniające wysoką efektywność i niskie koszta
 - Pozwala na ustawianie limitów finansowych na klucze API
 
+Testing i Quality Assurance:
+- Vitest do testów jednostkowych z szybkim wykonaniem
+- React Testing Library do testowania komponentów React
+- Playwright do testów end-to-end z obsługą wszystkich głównych przeglądarek
+- MSW (Mock Service Worker) do mockowania API w testach
+- axe-core do automatycznych testów dostępności
+
+Narzędzia deweloperskie:
+- ESLint i Prettier do utrzymania jakości kodu
+- Lighthouse do audytów wydajności i dostępności
+- Sentry do monitorowania błędów w produkcji
+- Supabase CLI do lokalnego developmentu
+
 CI/CD i Hosting:
-- Github Actions do tworzenia pipeline’ów CI/CD
+- Github Actions do tworzenia pipeline'ów CI/CD
 - DigitalOcean do hostowania aplikacji za pośrednictwem obrazu docker
