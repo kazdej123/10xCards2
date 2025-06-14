@@ -24,6 +24,9 @@ A web application to quickly create and manage educational flashcard sets using 
 - **Styling**: Tailwind CSS 4
 - **Backend**: Supabase (PostgreSQL, Auth)
 - **AI API**: Openrouter.ai
+- **Testing**: Vitest (unit), React Testing Library, Playwright (E2E), MSW (API mocking)
+- **Quality Assurance**: ESLint, Prettier, axe-core (accessibility), Lighthouse
+- **Monitoring**: Sentry
 - **CI/CD**: GitHub Actions
 - **Hosting**: DigitalOcean (Docker)
 
@@ -72,6 +75,11 @@ The app will be available at `http://localhost:3000`.
 - `npm run build` - Build the production site
 - `npm run preview` - Preview the production build locally
 - `npm run astro` - Astro CLI
+- `npm run test` - Run unit tests with Vitest
+- `npm run test:watch` - Run tests in watch mode
+- `npm run test:coverage` - Run tests with coverage report
+- `npm run test:e2e` - Run end-to-end tests with Playwright
+- `npm run test:e2e:ui` - Run E2E tests with Playwright UI
 - `npm run lint` - Run ESLint
 - `npm run lint:fix` - Run ESLint with auto-fix
 - `npm run format` - Format code with Prettier
