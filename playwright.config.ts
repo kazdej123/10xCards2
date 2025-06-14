@@ -44,9 +44,49 @@ export default defineConfig({
 
   /* Configure projects for major browsers */
   projects: [
+    // Setup projects - uruchamiają się przed testami
     {
-      name: "chromium",
-      use: { ...devices["Desktop Chrome"] },
+      name: "setup",
+      testMatch: /.*\.setup\.ts/,
+      teardown: "cleanup",
+    },
+
+    // Cleanup project - opcjonalnie czyści po testach
+    {
+      name: "cleanup",
+      testMatch: /.*\.cleanup\.ts/,
+    },
+
+    // Main testing project z uwierzytelnionym użytkownikiem
+    {
+      name: "chromium-user",
+      use: {
+        ...devices["Desktop Chrome"],
+        // Użyj zapisanego stanu uwierzytelniania
+        storageState: "e2e/.auth/user.json",
+      },
+      dependencies: ["setup"],
+    },
+
+    // Testing project z uwierzytelnonym administratorem
+    {
+      name: "chromium-admin",
+      use: {
+        ...devices["Desktop Chrome"],
+        // Użyj zapisanego stanu uwierzytelniania administratora
+        storageState: "e2e/.auth/admin.json",
+      },
+      dependencies: ["setup"],
+    },
+
+    // Testing project bez uwierzytelniania (dla testów publicznych stron)
+    {
+      name: "chromium-guest",
+      use: {
+        ...devices["Desktop Chrome"],
+        // Resetuj stan uwierzytelniania
+        storageState: { cookies: [], origins: [] },
+      },
     },
   ],
 

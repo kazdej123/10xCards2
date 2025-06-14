@@ -33,3 +33,6 @@ coverage/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# E2E Authentication storage (contains sensitive data)
+e2e/.auth
