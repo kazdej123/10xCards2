@@ -12,14 +12,16 @@ interface ImportMeta {
   readonly env: ImportMetaEnv;
 }
 
-interface User {
+export interface User {
   id: string;
-  email: string | null;
+  email: string | null | undefined;
 }
 
-declare namespace App {
-  interface Locals {
-    supabase: SupabaseClient<Database>;
-    user?: User;
+declare global {
+  namespace App {
+    interface Locals {
+      supabase: SupabaseClient<Database>;
+      user?: User;
+    }
   }
 }

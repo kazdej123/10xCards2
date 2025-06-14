@@ -41,7 +41,7 @@ export const onRequest = defineMiddleware(async ({ locals, cookies, url, request
     };
 
     // Redirect authenticated users away from auth pages
-    if (url.pathname === "/login" || url.pathname === "/register") {
+    if (url.pathname === "/login" || url.pathname === "/register" || url.pathname === "/reset-password") {
       return redirect("/generate");
     }
   } else {

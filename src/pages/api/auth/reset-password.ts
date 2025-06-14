@@ -31,7 +31,6 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     });
 
     if (error) {
-      console.error("Reset password error:", error);
       return new Response(JSON.stringify({ error: error.message }), {
         status: 400,
         headers: { "Content-Type": "application/json" },
@@ -48,8 +47,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
         headers: { "Content-Type": "application/json" },
       }
     );
-  } catch (error) {
-    console.error("Unexpected error in reset password:", error);
+  } catch {
     return new Response(JSON.stringify({ error: "Wystąpił nieoczekiwany błąd" }), {
       status: 500,
       headers: { "Content-Type": "application/json" },

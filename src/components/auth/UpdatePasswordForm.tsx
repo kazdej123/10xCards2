@@ -75,8 +75,7 @@ export function UpdatePasswordForm() {
       } else {
         setError(data.error || "Wystąpił błąd podczas aktualizacji hasła");
       }
-    } catch (error) {
-      console.error("Update password error:", error);
+    } catch {
       setError("Wystąpił błąd podczas wysyłania żądania");
     } finally {
       setIsLoading(false);

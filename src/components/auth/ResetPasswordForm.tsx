@@ -31,8 +31,7 @@ export function ResetPasswordForm() {
       } else {
         setError(data.error || "Wystąpił błąd podczas wysyłania linku resetującego");
       }
-    } catch (error) {
-      console.error("Reset password error:", error);
+    } catch {
       setError("Wystąpił błąd podczas wysyłania żądania");
     } finally {
       setIsLoading(false);

@@ -32,18 +32,19 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     } = await supabase.auth.getUser(accessToken);
 
     if (userError || !user) {
-      console.error("Invalid access token:", userError);
       return new Response(JSON.stringify({ error: "Nieprawidłowy lub wygasły token dostępu" }), {
         status: 400,
         headers: { "Content-Type": "application/json" },
       });
     }
 
+    // Set the session using the access token first
+    await supabase.auth.setSession({ access_token: accessToken, refresh_token: "" });
+
     // Update the user's password
-    const { error } = await supabase.auth.updateUser({ password }, { accessToken });
+    const { error } = await supabase.auth.updateUser({ password });
 
     if (error) {
-      console.error("Update password error:", error);
       return new Response(JSON.stringify({ error: error.message }), {
         status: 400,
         headers: { "Content-Type": "application/json" },
@@ -60,8 +61,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
         headers: { "Content-Type": "application/json" },
       }
     );
-  } catch (error) {
-    console.error("Unexpected error in update password:", error);
+  } catch {
     return new Response(JSON.stringify({ error: "Wystąpił nieoczekiwany błąd" }), {
       status: 500,
       headers: { "Content-Type": "application/json" },

@@ -18,10 +18,10 @@ export function LogoutButton() {
         // Redirect to home page
         window.location.href = "/";
       } else {
-        console.error("Logout failed");
+        // Silent fail - user will see they're still logged in
       }
-    } catch (error) {
-      console.error("Logout error:", error);
+    } catch {
+      // Silent fail - user will see they're still logged in
     } finally {
       setIsLoading(false);
     }
