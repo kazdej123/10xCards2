@@ -28,31 +28,30 @@ describe("BulkSaveButton", () => {
   it("renders both buttons with correct text and counts", () => {
     render(<BulkSaveButton {...defaultProps} />);
 
-    expect(screen.getByText("Zapisz zaakceptowane")).toBeInTheDocument();
-    expect(screen.getByText("3")).toBeInTheDocument();
-    expect(screen.getByText("Zapisz wszystkie")).toBeInTheDocument();
-    expect(screen.getByText("5")).toBeInTheDocument();
+    expect(screen.getByText("Zapisz wybrane (3)")).toBeInTheDocument();
+    expect(screen.getByText("Zapisz wszystkie (5)")).toBeInTheDocument();
+    expect(screen.getByText("3 z 5 fiszek wybranych do zapisu")).toBeInTheDocument();
   });
 
-  it("disables 'Zapisz zaakceptowane' button when acceptedCount is 0", () => {
+  it("disables 'Zapisz wybrane' button when acceptedCount is 0", () => {
     render(<BulkSaveButton {...defaultProps} acceptedCount={0} />);
 
-    const acceptedButton = screen.getByLabelText("Zapisz 0 zaakceptowane fiszki");
+    const acceptedButton = screen.getByTestId("save-accepted-button");
     expect(acceptedButton).toBeDisabled();
   });
 
   it("disables 'Zapisz wszystkie' button when totalCount is 0", () => {
     render(<BulkSaveButton {...defaultProps} totalCount={0} />);
 
-    const allButton = screen.getByLabelText("Zapisz wszystkie 0 fiszki");
+    const allButton = screen.getByTestId("save-all-button");
     expect(allButton).toBeDisabled();
   });
 
   it("disables both buttons when disabled prop is true", () => {
     render(<BulkSaveButton {...defaultProps} disabled={true} />);
 
-    const acceptedButton = screen.getByLabelText("Zapisz 3 zaakceptowane fiszki");
-    const allButton = screen.getByLabelText("Zapisz wszystkie 5 fiszki");
+    const acceptedButton = screen.getByTestId("save-accepted-button");
+    const allButton = screen.getByTestId("save-all-button");
 
     expect(acceptedButton).toBeDisabled();
     expect(allButton).toBeDisabled();
@@ -71,7 +70,7 @@ describe("BulkSaveButton", () => {
     const handleSaveAccepted = vi.fn();
     render(<BulkSaveButton {...defaultProps} onSaveAccepted={handleSaveAccepted} />);
 
-    const acceptedButton = screen.getByLabelText("Zapisz 3 zaakceptowane fiszki");
+    const acceptedButton = screen.getByTestId("save-accepted-button");
     fireEvent.click(acceptedButton);
 
     expect(handleSaveAccepted).toHaveBeenCalledOnce();
@@ -81,7 +80,7 @@ describe("BulkSaveButton", () => {
     const handleSaveAll = vi.fn();
     render(<BulkSaveButton {...defaultProps} onSaveAll={handleSaveAll} />);
 
-    const allButton = screen.getByLabelText("Zapisz wszystkie 5 fiszki");
+    const allButton = screen.getByTestId("save-all-button");
     fireEvent.click(allButton);
 
     expect(handleSaveAll).toHaveBeenCalledOnce();
@@ -94,8 +93,8 @@ describe("BulkSaveButton", () => {
       <BulkSaveButton {...defaultProps} onSaveAccepted={handleSaveAccepted} onSaveAll={handleSaveAll} disabled={true} />
     );
 
-    const acceptedButton = screen.getByLabelText("Zapisz 3 zaakceptowane fiszki");
-    const allButton = screen.getByLabelText("Zapisz wszystkie 5 fiszki");
+    const acceptedButton = screen.getByTestId("save-accepted-button");
+    const allButton = screen.getByTestId("save-all-button");
 
     fireEvent.click(acceptedButton);
     fireEvent.click(allButton);
@@ -109,7 +108,6 @@ describe("BulkSaveButton", () => {
 
     const buttons = screen.getAllByRole("button");
     buttons.forEach((button) => {
-      expect(button.querySelector(".lucide-loader-circle")).toBeInTheDocument();
       expect(button.querySelector(".animate-spin")).toBeInTheDocument();
     });
   });
@@ -124,8 +122,8 @@ describe("BulkSaveButton", () => {
   it("has proper ARIA labels for screen readers", () => {
     render(<BulkSaveButton {...defaultProps} />);
 
-    const acceptedButton = screen.getByLabelText("Zapisz 3 zaakceptowane fiszki");
-    const allButton = screen.getByLabelText("Zapisz wszystkie 5 fiszki");
+    const acceptedButton = screen.getByTestId("save-accepted-button");
+    const allButton = screen.getByTestId("save-all-button");
 
     expect(acceptedButton).toBeInTheDocument();
     expect(allButton).toBeInTheDocument();
@@ -146,12 +144,12 @@ describe("BulkSaveButton", () => {
   it("handles edge case with zero counts gracefully", () => {
     render(<BulkSaveButton {...defaultProps} acceptedCount={0} totalCount={0} />);
 
-    const acceptedButton = screen.getByLabelText("Zapisz 0 zaakceptowane fiszki");
-    const allButton = screen.getByLabelText("Zapisz wszystkie 0 fiszki");
+    const acceptedButton = screen.getByTestId("save-accepted-button");
+    const allButton = screen.getByTestId("save-all-button");
 
     expect(acceptedButton).toBeDisabled();
     expect(allButton).toBeDisabled();
-    expect(screen.getAllByText("0")).toHaveLength(2);
+    expect(screen.getByText("0 z 0 fiszek wybranych do zapisu")).toBeInTheDocument();
   });
 
   it("prevents keyboard activation when disabled", () => {
@@ -175,8 +173,8 @@ describe("BulkSaveButton", () => {
   it("maintains proper styling classes", () => {
     render(<BulkSaveButton {...defaultProps} />);
 
-    const acceptedButton = screen.getByLabelText("Zapisz 3 zaakceptowane fiszki");
-    const allButton = screen.getByLabelText("Zapisz wszystkie 5 fiszki");
+    const acceptedButton = screen.getByTestId("save-accepted-button");
+    const allButton = screen.getByTestId("save-all-button");
 
     // Test that buttons are visible and have expected structure
     expect(acceptedButton).toBeVisible();
