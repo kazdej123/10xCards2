@@ -12,8 +12,40 @@ export function LoginForm() {
     e.preventDefault();
     setError(null);
     setIsLoading(true);
-    // Form submission will be handled later
-    setIsLoading(false);
+
+    try {
+      const formData = new FormData();
+      formData.append("email", email);
+      formData.append("password", password);
+
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (response.redirected) {
+        // Follow the redirect from the server
+        window.location.href = response.url;
+        return;
+      }
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error);
+      }
+
+      // This shouldn't happen as successful login should redirect
+      window.location.href = "/generate";
+    } catch (err: unknown) {
+      const error = err as Error;
+      setError(
+        error.message === "Invalid login credentials"
+          ? "Nieprawidłowy email lub hasło"
+          : "Wystąpił błąd podczas logowania. Spróbuj ponownie."
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
