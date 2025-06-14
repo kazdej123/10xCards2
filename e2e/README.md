@@ -170,4 +170,229 @@ await expect(page).toHaveScreenshot("page-name.png");
 
 1. **Port Conflicts**: Ensure port 4321 is available
 2. **Dev Server**: Make sure `npm run dev:e2e` is running
-3. **Dependencies**: Run `npm install` and `npx playwright install chromium` 
+3. **Dependencies**: Run `npm install` and `npx playwright install chromium`
+
+## New Tests and Data-testid
+
+### Overview
+
+This directory contains complete E2E tests for the 10xCards application.
+
+### Key Components
+
+### 🔧 Configuration (playwright.config.ts)
+- Configured only for Chromium/Desktop Chrome
+- Enabled trace and debugging
+- Parallel execution
+- Automatic dev server
+
+### 📋 Page Object Models
+- **BasePage**: Common methods for all pages
+- **HomePage**: Methods specific to the home page
+- **GeneratePage**: Methods for the generate flashcard page
+
+### 🏷️ Data-testid
+
+According to best practices, all UI components contain data-testid selectors:
+
+#### Authentication Components
+- `auth-buttons-container` - authentication buttons container
+- `login-button` - login button
+- `register-button` - register button
+- `logout-button` - logout button
+
+#### Generate Flashcard Components
+- `flashcard-generation-view` - main generation view
+- `text-input-area` - text input area
+- `source-text-input` - text input field
+- `character-counter` - character counter
+- `text-validation-message` - validation message
+- `generate-button` - generate button
+- `error-message` - error message
+- `flashcard-list` - flashcard list
+- `bulk-save-buttons` - bulk save buttons container
+- `stats-counter` - stats counter
+- `save-accepted-button` - save accepted button
+- `save-all-button` - save all button
+
+### Test Scenarios
+
+#### 🏠 Home Page (home-page.spec.ts)
+- Loading the home page
+- Displaying authentication buttons
+- Navigating to login/register pages
+- Page structure and accessibility
+- Visual tests (screenshots)
+
+#### 🎯 Generate Flashcards (generate.spec.ts)
+- Loading the generate page
+- Validating text length
+- Character counter
+- Enabling/disabling generate button
+- Accessibility tests
+
+#### 🔄 Navigation (example.spec.ts)
+- Navigation flow between pages
+- Branding consistency
+- Page structure
+- Visual tests
+
+#### 🌐 API (api.spec.ts)
+- API endpoint tests
+- Input data validation
+- Error handling
+- CORS tests
+
+## Running Tests
+
+### Preparation
+```bash
+# Install dependencies
+npm install
+
+# Start dev server for e2e testing
+npm run dev:e2e
+```
+
+### Running Tests
+```bash
+# All tests
+npx playwright test
+
+# Specific group of tests
+npx playwright test home-page.spec.ts
+npx playwright test generate.spec.ts
+npx playwright test api.spec.ts
+
+# Test in headed mode (with browser visible)
+npx playwright test --headed
+
+# Test with debugging
+npx playwright test --debug
+```
+
+### Developer Tools
+```bash
+# Codegen - recording tests
+npx playwright codegen http://localhost:4321
+
+# Trace viewer - debugging
+npx playwright show-trace
+
+# HTML report
+npx playwright show-report
+```
+
+## Best Practices
+
+### ✅ AAA Structure
+All tests use the Arrange-Act-Assert pattern:
+```typescript
+test("should do something", async ({ page }) => {
+  // Arrange
+  const homePage = new HomePage(page);
+  
+  // Act
+  await homePage.navigateToHome();
+  
+  // Assert
+  await expect(page).toHaveTitle(/Expected Title/);
+});
+```
+
+### ✅ Data-testid
+Use data-testid selectors instead of CSS selectors:
+```typescript
+// ✅ Correct
+await page.getByTestId("login-button").click();
+
+// ❌ Incorrect
+await page.click(".login-btn");
+```
+
+### ✅ Page Object Model
+Encapsulate page logic in Page Objects:
+```typescript
+// ✅ Correct
+await homePage.clickLoginButton();
+
+// ❌ Incorrect
+await page.getByTestId("login-button").click();
+```
+
+### ✅ Fixtures
+Use fixtures for shared Page Objects:
+```typescript
+test("should test something", async ({ homePage, generatePage }) => {
+  // homePage and generatePage are automatically available
+});
+```
+
+## Debugging
+
+### Trace Viewer
+```bash
+npx playwright test --trace on
+npx playwright show-trace
+```
+
+### Screenshots
+```bash
+# Automatic screenshots on failures
+npx playwright test
+
+# Visual comparison
+await expect(page).toHaveScreenshot("expected.png");
+```
+
+### Console
+```bash
+# Logs in console
+npx playwright test --reporter=line
+```
+
+## Extensions
+
+### Adding New Tests
+1. Add data-testid selectors to components
+2. Extend Page Objects in `page-objects/`
+3. Create new test file in `tests/`
+4. Use AAA pattern
+
+### Adding New Page Objects
+1. Extend `BasePage`
+2. Add to `test-fixtures.ts`
+3. Use in tests via fixtures
+
+### Mocking API
+```typescript
+await page.route("**/api/endpoint", (route) => {
+  route.fulfill({
+    status: 200,
+    contentType: "application/json",
+    body: JSON.stringify({ data: "mock" }),
+  });
+});
+```
+
+## Monitoring
+
+### CI/CD
+Tests are configured to:
+- Parallel execution
+- Retry on failures
+- Generate reports (HTML, JSON, JUnit)
+- Trace on failures
+
+### Metrics
+- Test execution time
+- Test pass percentage
+- Visual coverage (screenshots)
+
+## Support
+
+In case of issues:
+1. Check if dev server is running: `npm run dev:e2e`
+2. Check trace: `npx playwright show-trace`
+3. Run with debug: `npx playwright test --debug`
+4. Check HTML report: `npx playwright show-report` 

@@ -1,41 +1,68 @@
-import { test, expect } from "@playwright/test";
-import { HomePage } from "../page-objects/home-page";
+import { test, expect } from "../fixtures/test-fixtures";
 
-test.describe("Home Page Tests", () => {
-  test("should load home page successfully", async ({ page }) => {
-    // Arrange
-    const homePage = new HomePage(page);
-
-    // Act
+test.describe("Application Navigation Tests", () => {
+  test("should navigate through main application flow", async ({ homePage }) => {
+    // Arrange & Act - Start at home page
     await homePage.navigateToHome();
 
-    // Assert
+    // Assert - Home page loads correctly
     await homePage.verifyHomePageLoaded();
-    await expect(page).toHaveTitle(/10x Cards/i);
+    await homePage.verifyAppTitle();
+    await expect(homePage.getPage()).toHaveTitle(/10x Cards/i);
+
+    // Act - Check auth buttons are present
+    await expect(homePage.getByTestId("auth-buttons-container")).toBeVisible();
+    await expect(homePage.getByTestId("login-button")).toBeVisible();
+    await expect(homePage.getByTestId("register-button")).toBeVisible();
   });
 
-  test("should take screenshot on home page", async ({ page }) => {
-    // Arrange
-    const homePage = new HomePage(page);
-
-    // Act
-    await homePage.navigateToHome();
-
-    // Assert - Visual comparison
-    await expect(page).toHaveScreenshot("home-page.png");
-  });
-
-  test.skip("example search functionality", async ({ page }) => {
-    // Arrange
-    const homePage = new HomePage(page);
-    const searchTerm = "test query";
-
-    // Act
-    await homePage.navigateToHome();
-    await homePage.performSearch(searchTerm);
+  test("should handle direct navigation to generate page", async ({ generatePage }) => {
+    // Arrange & Act
+    await generatePage.navigateToGenerate();
 
     // Assert
-    // Add assertions based on your application's search functionality
-    await expect(page.getByTestId("search-results")).toBeVisible();
+    await generatePage.verifyGeneratePageLoaded();
+    await expect(generatePage.getPage()).toHaveTitle(/Generuj fiszki/i);
+  });
+
+  test("should display proper page structure across pages", async ({ homePage, generatePage }) => {
+    // Arrange & Act - Test home page
+    await homePage.navigateToHome();
+
+    // Assert - Home page structure
+    await expect(homePage.getPage().locator('h1:has-text("10xCards.ai")')).toBeVisible();
+
+    // Act - Navigate to generate page
+    await generatePage.navigateToGenerate();
+
+    // Assert - Generate page structure
+    await expect(generatePage.getPage().locator('h1:has-text("Generuj fiszki")')).toBeVisible();
+    await expect(generatePage.getByTestId("flashcard-generation-view")).toBeVisible();
+  });
+
+  test("should maintain consistent branding across pages", async ({ homePage, generatePage }) => {
+    // Arrange & Act - Check home page branding
+    await homePage.navigateToHome();
+    await expect(homePage.getPage().locator('h1:has-text("10xCards.ai")')).toBeVisible();
+
+    // Act & Assert - Check generate page branding
+    await generatePage.navigateToGenerate();
+    await expect(generatePage.getPage().locator('a:has-text("10xCards.ai")')).toBeVisible();
+  });
+
+  test("should take comprehensive screenshots for visual regression", async ({ homePage, generatePage }) => {
+    // Arrange & Act - Home page screenshot
+    await homePage.navigateToHome();
+    await homePage.getPage().waitForLoadState("networkidle");
+
+    // Assert - Visual comparison home page
+    await expect(homePage.getPage()).toHaveScreenshot("home-page-full.png");
+
+    // Act - Generate page screenshot
+    await generatePage.navigateToGenerate();
+    await generatePage.getPage().waitForLoadState("networkidle");
+
+    // Assert - Visual comparison generate page
+    await expect(generatePage.getPage()).toHaveScreenshot("generate-page-full.png");
   });
 });

@@ -14,7 +14,7 @@ export function FlashcardList({ flashcards, onAccept, onEdit, onReject }: Flashc
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4" data-testid="flashcard-list">
       {flashcards.map((flashcard) => (
         <FlashcardListItem
           key={flashcard.id}

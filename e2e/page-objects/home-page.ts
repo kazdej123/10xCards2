@@ -18,8 +18,55 @@ export class HomePage extends BasePage {
    */
   async verifyHomePageLoaded(): Promise<void> {
     await this.verifyUrl("/");
-    // Add specific home page verification here
-    // Example: await this.verifyElementVisible('home-header');
+    await this.verifyElementVisible("auth-buttons-container");
+  }
+
+  /**
+   * Verify app title is displayed
+   */
+  async verifyAppTitle(): Promise<void> {
+    await this.page.waitForSelector('h1:has-text("10xCards.ai")', { state: "visible" });
+  }
+
+  /**
+   * Click login button
+   */
+  async clickLoginButton(): Promise<void> {
+    await this.clickByTestId("login-button");
+  }
+
+  /**
+   * Click register button
+   */
+  async clickRegisterButton(): Promise<void> {
+    await this.clickByTestId("register-button");
+  }
+
+  /**
+   * Check if user is logged in by looking for logout button
+   */
+  async isLoggedIn(): Promise<boolean> {
+    try {
+      await this.page.waitForSelector('[data-testid="logout-button"]', { timeout: 2000 });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Click logout button (when logged in)
+   */
+  async clickLogoutButton(): Promise<void> {
+    await this.clickByTestId("logout-button");
+  }
+
+  /**
+   * Navigate to generate page (when logged in)
+   */
+  async navigateToGeneratePage(): Promise<void> {
+    await this.page.click('a[href="/generate"]');
+    await this.waitForPageLoad();
   }
 
   /**

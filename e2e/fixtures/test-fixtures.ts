@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import { test as base, type Page } from "@playwright/test";
 import { HomePage } from "../page-objects/home-page";
+import { GeneratePage } from "../page-objects/generate-page";
 
 /**
  * Custom test fixtures
@@ -8,6 +9,7 @@ import { HomePage } from "../page-objects/home-page";
  */
 export const test = base.extend<{
   homePage: HomePage;
+  generatePage: GeneratePage;
   authenticatedPage: Page;
 }>({
   // Page Object fixtures
@@ -15,6 +17,11 @@ export const test = base.extend<{
   homePage: async ({ page }, use) => {
     const homePage = new HomePage(page);
     await use(homePage);
+  },
+
+  generatePage: async ({ page }, use) => {
+    const generatePage = new GeneratePage(page);
+    await use(generatePage);
   },
 
   // Example: Authenticated page fixture

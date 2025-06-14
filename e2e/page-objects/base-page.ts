@@ -109,4 +109,11 @@ export abstract class BasePage {
   async verifyElementHidden(testId: string): Promise<void> {
     await expect(this.getByTestId(testId)).toBeHidden();
   }
+
+  /**
+   * Get the page instance for direct access when needed
+   */
+  getPage(): Page {
+    return this.page;
+  }
 }

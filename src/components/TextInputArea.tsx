@@ -18,17 +18,23 @@ export function TextInputArea({ value, onChange, disabled }: TextInputAreaProps)
     : null;
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-3" data-testid="text-input-area">
       <div className="flex justify-between items-center">
         <Label htmlFor="source-text" className="text-blue-100 font-medium text-lg">
           Tekst źródłowy
         </Label>
-        <div className={`text-sm font-medium ${countColor}`} role="status" aria-live="polite">
+        <div
+          className={`text-sm font-medium ${countColor}`}
+          role="status"
+          aria-live="polite"
+          data-testid="character-counter"
+        >
           {characterCount} / 10000 znaków
         </div>
       </div>
       <Textarea
         id="source-text"
+        data-testid="source-text-input"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         disabled={disabled}
@@ -40,6 +46,7 @@ export function TextInputArea({ value, onChange, disabled }: TextInputAreaProps)
       {validationMessage && (
         <div
           id="text-validation"
+          data-testid="text-validation-message"
           className="text-sm text-red-200 bg-red-500/20 border border-red-500/30 rounded-lg p-3 backdrop-blur-sm"
           role="alert"
         >
