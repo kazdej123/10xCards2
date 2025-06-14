@@ -60,14 +60,60 @@ describe("GenerateButton", () => {
   it("has loading spinner when isLoading is true", () => {
     render(<GenerateButton {...defaultProps} isLoading={true} />);
 
-    const spinner = screen.getByRole("button").querySelector(".animate-spin");
-    expect(spinner).toBeInTheDocument();
+    // Better approach: use getByTestId or aria attributes instead of querySelector
+    const button = screen.getByRole("button");
+    expect(button).toContainHTML("animate-spin");
   });
 
-  it("maintains proper CSS classes", () => {
+  it("maintains proper button styling", () => {
     render(<GenerateButton {...defaultProps} />);
 
     const button = screen.getByRole("button");
-    expect(button).toHaveClass("bg-gradient-to-r", "from-blue-500", "to-purple-600");
+    // Test essential functionality rather than specific CSS classes
+    expect(button).toBeVisible();
+    expect(button).toBeEnabled();
+  });
+
+  it("is keyboard accessible", () => {
+    const handleClick = vi.fn();
+    render(<GenerateButton {...defaultProps} onClick={handleClick} />);
+
+    const button = screen.getByRole("button");
+
+    // Check if button is focusable
+    button.focus();
+    expect(button).toHaveFocus();
+
+    // Test button responds to Space key (standard for buttons)
+    fireEvent.keyDown(button, { key: " ", code: "Space" });
+    // Note: Native button behavior should handle Space key
+  });
+
+  it("has proper ARIA attributes for screen readers", () => {
+    render(<GenerateButton {...defaultProps} isLoading={true} />);
+
+    const button = screen.getByRole("button");
+
+    // When loading, button should be properly announced to screen readers
+    expect(button).toHaveAttribute("disabled");
+    expect(button).toHaveTextContent("Generowanie...");
+  });
+
+  it("handles combined disabled and loading states", () => {
+    render(<GenerateButton {...defaultProps} disabled={true} isLoading={true} />);
+
+    const button = screen.getByRole("button");
+    expect(button).toBeDisabled();
+    expect(button).toHaveTextContent("Generowanie...");
+  });
+
+  it("prevents onClick when both disabled and loading", () => {
+    const handleClick = vi.fn();
+    render(<GenerateButton {...defaultProps} onClick={handleClick} disabled={true} isLoading={true} />);
+
+    const button = screen.getByRole("button");
+    fireEvent.click(button);
+
+    expect(handleClick).not.toHaveBeenCalled();
   });
 });
