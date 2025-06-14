@@ -8,7 +8,7 @@ async function globalSetup() {
 
   // 1. Check if development server is running
   try {
-    const response = await fetch("http://localhost:4321");
+    const response = await fetch("http://localhost:3000");
     if (!response.ok) {
       throw new Error("Development server not responding");
     }
@@ -23,7 +23,7 @@ async function globalSetup() {
 
   // 2. Verify API endpoints are accessible (optional - will fail gracefully in tests)
   try {
-    const healthResponse = await fetch("http://localhost:4321/api/health");
+    const healthResponse = await fetch("http://localhost:3000/api/health");
     if (healthResponse.ok) {
       // eslint-disable-next-line no-console
       console.log("✅ API health endpoint is accessible");

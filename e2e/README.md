@@ -120,7 +120,7 @@ The Playwright configuration is in `playwright.config.ts` at the root level.
 
 Key configurations:
 - **Browser**: Only Chromium (Desktop Chrome)
-- **Base URL**: http://localhost:4321
+- **Base URL**: http://localhost:3000
 - **Parallel**: Enabled for faster execution
 - **Retries**: 2 retries on CI, 0 locally
 - **Screenshots**: Only on failure
@@ -168,7 +168,7 @@ await expect(page).toHaveScreenshot("page-name.png");
 
 ### Environment Issues
 
-1. **Port Conflicts**: Ensure port 4321 is available
+1. **Port Conflicts**: Ensure port 3000 is available
 2. **Dev Server**: Make sure `npm run dev:e2e` is running
 3. **Dependencies**: Run `npm install` and `npx playwright install chromium`
 
@@ -274,7 +274,7 @@ npx playwright test --debug
 ### Developer Tools
 ```bash
 # Codegen - recording tests
-npx playwright codegen http://localhost:4321
+npx playwright codegen http://localhost:3000
 
 # Trace viewer - debugging
 npx playwright show-trace
