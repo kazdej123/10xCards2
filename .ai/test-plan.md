@@ -3,10 +3,13 @@
 ## 1. Wprowadzenie i cele testowania
 
 ### 1.1 Wprowadzenie
+
 Niniejszy dokument przedstawia plan testów dla aplikacji internetowej 10xCards2. Aplikacja ta umożliwia użytkownikom generowanie, zarządzanie zestawów fiszek edukacyjnych z wykorzystaniem technologii AI w oparciu o wybrany stos technologiczny. Projekt wykorzystuje technologie takie jak Astro 5, React 19, TypeScript 5, Tailwind 4, Shadcn/ui oraz Supabase do autentykacji i bazy danych.
 
 ### 1.2 Cele testowania
+
 Głównymi celami testowania projektu 10xCards2 są:
+
 - Weryfikacja zgodności funkcjonalnej aplikacji z jej przeznaczeniem (generowanie fiszek przez AI, ręczne zarządzanie fiszkami, autentykacja)
 - Zapewnienie wysokiej jakości i niezawodności aplikacji
 - Identyfikacja i raportowanie defektów w celu ich naprawy przed wdrożeniem
@@ -20,7 +23,9 @@ Głównymi celami testowania projektu 10xCards2 są:
 ## 2. Zakres testów
 
 ### 2.1 Funkcjonalności objęte testami:
+
 - **Moduł Generacji Fiszek (AI Generation)**:
+
   - Interfejs wprowadzania tekstu źródłowego
   - Działanie mechanizmu generacji AI
   - Wyświetlanie wygenerowanych propozycji fiszek
@@ -30,6 +35,7 @@ Głównymi celami testowania projektu 10xCards2 są:
   - Dostępność (nawigacja klawiaturą, czytniki ekranu)
 
 - **Moduł Zarządzania Fiszkami (Flashcard Management)**:
+
   - Wyświetlanie listy fiszek użytkownika z paginacją
   - Ręczne tworzenie nowych fiszek (formularz przód/tył)
   - Edycja istniejących fiszek (formularz z walidacją)
@@ -39,6 +45,7 @@ Głównymi celami testowania projektu 10xCards2 są:
   - Wyświetlanie informacji o konieczności zalogowania dla niezalogowanych użytkowników
 
 - **Moduł Autentykacji**:
+
   - Formularz logowania (walidacja pól, proces logowania przez API, obsługa błędów, przekierowanie)
   - Formularz rejestracji (walidacja pól, proces rejestracji, obsługa błędów)
   - Formularz resetowania hasła (walidacja email, komunikat po wysłaniu)
@@ -58,29 +65,36 @@ Głównymi celami testowania projektu 10xCards2 są:
   - Podstawowe testy bezpieczeństwa (OWASP Top 10)
 
 ## 3. Typy testów do przeprowadzenia
+
 W ramach projektu zostaną przeprowadzone następujące typy testów:
 
 - **Testy jednostkowe (Unit Tests)**:
+
   - Cel: Weryfikacja poprawności działania izolowanych jednostek kodu (funkcje pomocnicze, komponenty React z prostą logiką, walidatory formularzy, utility functions)
   - Narzędzia: Vitest, React Testing Library
 
 - **Testy integracyjne (Integration Tests)**:
+
   - Cel: Weryfikacja współpracy między różnymi modułami i komponentami (komponenty React <-> API Astro, API Astro <-> Supabase, API Astro <-> OpenRouter, komponenty UI flow)
   - Narzędzia: Vitest, React Testing Library, Mock Service Worker (MSW) do mockowania API
 
 - **Testy End-to-End (E2E Tests)**:
+
   - Cel: Weryfikacja kompletnych przepływów użytkownika z perspektywy przeglądarki, symulując realne interakcje
   - Narzędzia: Playwright
 
 - **Testy wizualne (Visual Regression Tests)**:
+
   - Cel: Wykrywanie niezamierzonych zmian w interfejsie użytkownika poprzez porównywanie zrzutów ekranu
   - Narzędzia: Chromatic/Percy (dedykowane narzędzie jak Storybook będzie używany szerzej)
 
 - **Testy dostępności (Accessibility Tests)**:
+
   - Cel: Zapewnienie zgodności z wytycznymi WCAG (np. AA)
   - Narzędzia: axe-core (automatyczna), manualna weryfikacja (nawigacja klawiaturą, czytniki ekranu)
 
 - **Testy manualne eksploracyjne (Manual Exploratory Tests)**:
+
   - Cel: Eksploracja aplikacji w celu znalezienia nieoczywistych błędów, ocena UX/UI
 
 - **Testy akceptacyjne użytkownika (UAT)**:
@@ -150,20 +164,24 @@ Poniżej przedstawiono przykładowe, wysokopoziomowe scenariusze testowe. Szczeg
 ## 5. Środowisko testowe
 
 ### Środowiska:
+
 - **Lokalne (Developerskie)**: Używane przez deweloperów do testów jednostkowych i integracyjnych podczas rozwoju
 - **Testowe/Staging**: Dedykowane środowisko QA, odzwierciedlające środowisko produkcyjne. Zalecane użycie jednej instancji Supabase z oddzieleniem danych testowych przez Row Level Security (RLS). Używane do testów integracyjnych, E2E, manualnych, UAT
 - **Produkcyjne**: Środowisko live. Ograniczone testy (smoke tests) po wdrożeniu
 
 ### Przeglądarki:
+
 - Google Chrome (najnowsza wersja)
-- Mozilla Firefox (najnowsza wersja)  
+- Mozilla Firefox (najnowsza wersja)
 - Apple Safari (najnowsza wersja)
 
 ### Urządzenia:
+
 - Desktop (Windows, macOS)
 - Symulacja urządzeń mobilnych (Chrome DevTools) dla testów responsywności. W miarę możliwości testy na fizycznych urządzeniach (iOS, Android)
 
 ### Dane testowe:
+
 - Konta użytkowników testowych
 - Przykładowe teksty do generacji fiszek (różne długości, języki, złożoność)
 - Przykładowe fiszki utworzone ręcznie i przez AI
@@ -171,7 +189,7 @@ Poniżej przedstawiono przykładowe, wysokopoziomowe scenariusze testowe. Szczeg
 ## 6. Narzędzia do testowania
 
 - **Vitest** + **React Testing Library** (testy jednostkowe)
-- **Playwright** (testy E2E) 
+- **Playwright** (testy E2E)
 - **MSW (Mock Service Worker)** (mockowanie API)
 - **Lighthouse** (wydajność i dostępność)
 - **axe-core** (dostępność)
@@ -180,6 +198,7 @@ Poniżej przedstawiono przykładowe, wysokopoziomowe scenariusze testowe. Szczeg
 - **Supabase CLI** (emulator lokalny)
 
 ### Narzędzia QA:
+
 - **GitHub Issues** (wskazać narzędzie, np. Jira, GitHub Issues)
 - **Format zgłoszenia**: Każdy zgłoszony błąd powinien zawierać:
   - **Tytuł**: Krótki, zwięzły opis problemu
@@ -192,26 +211,29 @@ Poniżej przedstawiono przykładowe, wysokopoziomowe scenariusze testowe. Szczeg
   - **Przypisanie**: (Opcjonalnie) Sugerowany developer lub zespół
 
 ### Cykl życia błędu:
+
 - **Nowy** -> **W analizie** -> **Do naprawy** -> **W trakcie naprawy** -> **Do weryfikacji** -> **Zamknięty/Odrzucony/Ponownie otwarty**
 
 ## 7. Harmonogram testów (Przykładowy)
-| Faza                             | Czas trwania   | Odpowiedzialny |
-|----------------------------------|----------------|----------------|
-| Przygotowanie środowiska i setup narzędzi | 1.5 dnia | QA Engineer + DevOps |
-| Testy jednostkowe                | 2 dni          | Developers |
-| Testy integracyjne               | 2 dni          | QA Engineer |
-| Testy E2E i cross-browser        | 2.5 dnia       | QA Engineer |
-| Testy eksploracyjne i manualne   | 1.5 dnia       | QA Engineer |
-| Testy wydajności i bezpieczeństwa| 1 dzień        | QA Lead + DevOps |
-| Visual regression i accessibility| 1 dzień        | QA Engineer |
-| **Pierwszy cykl napraw**         | **2 dni**      | **Developers** |
-| **Retesty po naprawach**         | **1.5 dnia**   | **QA Engineer** |
-| Testy UAT                        | 1 dzień        | Product Owner |
-| **Drugi cykl napraw (opcjonalny)**| **1 dzień**   | **Developers** |
-| Raportowanie i zamknięcie        | 1 dzień        | QA Lead |
-| **RAZEM**                        | **18 dni**     | |
+
+| Faza                                      | Czas trwania | Odpowiedzialny       |
+| ----------------------------------------- | ------------ | -------------------- |
+| Przygotowanie środowiska i setup narzędzi | 1.5 dnia     | QA Engineer + DevOps |
+| Testy jednostkowe                         | 2 dni        | Developers           |
+| Testy integracyjne                        | 2 dni        | QA Engineer          |
+| Testy E2E i cross-browser                 | 2.5 dnia     | QA Engineer          |
+| Testy eksploracyjne i manualne            | 1.5 dnia     | QA Engineer          |
+| Testy wydajności i bezpieczeństwa         | 1 dzień      | QA Lead + DevOps     |
+| Visual regression i accessibility         | 1 dzień      | QA Engineer          |
+| **Pierwszy cykl napraw**                  | **2 dni**    | **Developers**       |
+| **Retesty po naprawach**                  | **1.5 dnia** | **QA Engineer**      |
+| Testy UAT                                 | 1 dzień      | Product Owner        |
+| **Drugi cykl napraw (opcjonalny)**        | **1 dzień**  | **Developers**       |
+| Raportowanie i zamknięcie                 | 1 dzień      | QA Lead              |
+| **RAZEM**                                 | **18 dni**   |                      |
 
 ## 8. Kryteria akceptacji testów
+
 - Pokrycie testami jednostkowymi ≥ 90%
 - 100% kluczowych scenariuszy E2E wykonanych pomyślnie
 - Brak krytycznych i blokujących defektów
@@ -225,6 +247,7 @@ Poniżej przedstawiono przykładowe, wysokopoziomowe scenariusze testowe. Szczeg
 ## 9. Role i odpowiedzialności
 
 ### QA/Testerzy:
+
 - **QA Lead**: Planowanie i nadzór nad testami, analiza metryk
 - **QA Engineer**: Pisanie i wykonywanie testów, setup narzędzi
 - Raportowanie i śledzenie błędów
@@ -232,40 +255,49 @@ Poniżej przedstawiono przykładowe, wysokopoziomowe scenariusze testowe. Szczeg
 - Utrzymanie środowiska testowego (współnie z DevOps/Developerami)
 
 ### Developerzy:
+
 - Pisanie testów jednostkowych i podstawowych integracyjnych
 - Naprawa zgłoszonych błędów
 - Code reviews pod kątem jakości i testowalności
 - Wsparcie w diagnozowaniu problemów znalezionych przez QA
 
 ### Product Owner/Manager:
+
 - Definiowanie wymagań i kryteriów akceptacji
 - Priorytetyzacja błędów
 - Przeprowadzanie testów UAT
 - Podejmowanie decyzji o wydaniu produktu
 
 ### DevOps:
+
 - Konfiguracja środowisk CI/CD, monitoring
 - Utrzymanie środowiska testowego (współnie z DevOps/Developerami)
 
 ## 10. Procedury raportowania błędów
 
 ### Narzędzia: GitHub Issues
-### Format zgłoszenia: 
+
+### Format zgłoszenia:
+
 Każdy zgłoszony błąd powinien zawierać:
+
 - **Tytuł**: Krótki, zwięzły opis problemu
 - **Środowisko**: Gdzie błąd został zaobserwowany (np. Testowe, Produkcyjne, przeglądarka, wersja)
-- **Kroki do reprodukcji**: Szczegółowa lista kroków odtwarzających błąd  
+- **Kroki do reprodukcji**: Szczegółowa lista kroków odtwarzających błąd
 - **Wynik oczekiwany**: Jak system powinien się zachować
 - **Wynik rzeczywisty**: Jak system się zachował
 - **Priorytet/Waga**: (np. Krytyczny, Wysoki, Średni, Niski) - ocena wpływu błędu
 - **Załączniki**: Zrzuty ekranu, nagrania wideo, logi konsoli (jeśli relevantne)
 - **Przypisanie**: (Opcjonalnie) Sugerowany developer lub zespół
 
-### Cykl życia błędu: 
+### Cykl życia błędu:
+
 **Nowy** -> **W analizie** -> **Do naprawy** -> **W trakcie naprawy** -> **Do weryfikacji** -> **Zamknięty/Odrzucony/Ponownie otwarty**
 
-### Komunikacja: 
+### Komunikacja:
+
 Regularne przeglądy błędów (Bug Triage) w celu priorytetyzacji i omówienia statusu
+
 1. Zgłoszenie błędu na GitHub Issues z etykietami: `bug`, priorytet, oraz kategoria (frontend/backend/integration)
 2. Wypełnienie szablonu zgodnie z formatem powyżej
 3. Klasyfikacja: blocker, critical, major, minor, trivial
@@ -274,6 +306,7 @@ Regularne przeglądy błędów (Bug Triage) w celu priorytetyzacji i omówienia 
 6. Regularne review i aktualizacja statusów
 
 ## 11. Specjalne uwagi techniczne
+
 - **Astro 5 Islands**: Szczególna uwaga na testowanie partial hydration i interakcji między wyspami React
 - **Supabase RLS**: Weryfikacja Row Level Security dla endpoint'ów fiszek użytkowników
 - **OpenRouter**: Testowanie różnych modeli AI, handling quota limits, rate limiting, timeout handling
@@ -295,11 +328,13 @@ Regularne przeglądy błędów (Bug Triage) w celu priorytetyzacji i omówienia 
 ## 12. Strategia testowania AI (AI Testing Strategy)
 
 ### Mockowanie vs rzeczywiste API:
+
 - **Testy jednostkowe i integracyjne**: Mockowanie OpenRouter API za pomocą MSW (Mock Service Worker)
 - **Testy E2E**: Użycie rzeczywistego OpenRouter API z ograniczonym budżetem testowym
 - **Development**: Kombinacja mock'ów i rzeczywistego API w zależności od potrzeb
 
 ### Testowanie różnych scenariuszy AI:
+
 - **Timeout handling**: Testowanie zachowania przy przekroczeniu 60-sekundowego limitu
 - **Rate limiting**: Obsługa błędów quota exceeded i rate limit
 - **Error codes**: Testowanie różnych kodów błędów OpenRouter (400, 429, 503)
@@ -307,14 +342,17 @@ Regularne przeglądy błędów (Bug Triage) w celu priorytetyzacji i omówienia 
 - **Response validation**: Weryfikacja struktury i jakości odpowiedzi AI
 
 ### Dane testowe dla AI:
+
 - Przygotowanie zestawu tekstów testowych różnej długości (1000-10000 znaków)
 - Teksty w różnych językach i domenach (nauka, historia, nauki ścisłe)
 - Edge cases: teksty z specjalnymi znakami, formatowaniem, długie akapity
 
 ### Metryki jakości AI:
+
 - Monitoring czasu odpowiedzi generacji fiszek
 - Śledzenie współczynnika sukcesu wywołań API
 - Analiza jakości generowanych fiszek (czy są sensowne jako pytania/odpowiedzi)
 
 ---
-*Dokument zaktualizowany zgodnie z aktualnym MVP, PRD i tech-stack projektu 10xCards2.*
+
+_Dokument zaktualizowany zgodnie z aktualnym MVP, PRD i tech-stack projektu 10xCards2._

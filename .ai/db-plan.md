@@ -23,7 +23,7 @@ This table is managed by Supabase Auth.
 - generation_id: BIGINT REFERENCES generations(id) ON DELETE SET NULL
 - user_id: UUID NOT NULL REFERENCES users(id)
 
-*Trigger: Automatically update the 'updated_at' column on record updates.*
+_Trigger: Automatically update the 'updated_at' column on record updates._
 
 ### 1.3. generations
 
@@ -84,7 +84,8 @@ ALTER TABLE generation_error_logs ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users can view their error logs" ON generation_error_logs
   USING (auth.uid() = user_id)
   WITH CHECK (auth.uid() = user_id);
-``` 
+```
 
 ## 5. Dodatkowe uwagi
+
 - Triggery (np. `update_updated_at()`) powinny automatycznie aktualizować kolumnę `updated_at` na każdej tabeli, w której ta kolumna występuje

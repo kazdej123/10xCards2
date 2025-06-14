@@ -5,6 +5,7 @@
 Aplikacja 10x-cards to web application zbudowana w Astro 5 z komponentami React 19. Główną filozofią architektury jest prostota i efektywność w tworzeniu fiszek edukacyjnych z wykorzystaniem AI.
 
 Struktura UI opiera się na czterech głównych obszarach funkcjonalnych:
+
 - **Generowanie AI** - główny widok z textarea i propozycjami fiszek
 - **Zarządzanie fiszkami** - przeglądanie, edycja i usuwanie własnych fiszek
 - **Sesja nauki** - algorytm spaced repetition dla nauki fiszek
@@ -15,9 +16,10 @@ Nawigacja realizowana jest przez topbar z Navigation Menu, który scrolluje wraz
 ## 2. Lista widoków
 
 ### Widok Uwierzytelniania
+
 - **Ścieżka widoku:** `/auth/login`, `/auth/register`
 - **Główny cel:** Umożliwienie użytkownikom logowania i rejestracji w systemie
-- **Kluczowe informacje do wyświetlenia:** 
+- **Kluczowe informacje do wyświetlenia:**
   - Formularz logowania (email, hasło)
   - Formularz rejestracji (email, hasło, potwierdzenie hasła)
   - Komunikaty o błędach walidacji
@@ -32,6 +34,7 @@ Nawigacja realizowana jest przez topbar z Navigation Menu, który scrolluje wraz
   - JWT token handling z automatic redirect po udanym logowaniu
 
 ### Widok generowania AI
+
 - **Ścieżka widoku:** `/generate`
 - **Główny cel:** Umożliwienie użytkownikom wprowadzenia tekstu (1000-10000 znaków) i wygenerowania propozycji fiszek przez AI oraz ich zarządzanie przed zapisem.
 - **Kluczowe informacje do wyświetlenia:**
@@ -59,6 +62,7 @@ Nawigacja realizowana jest przez topbar z Navigation Menu, który scrolluje wraz
   - Proper focus management i keyboard navigation
 
 ### Moje Fiszki
+
 - **Ścieżka widoku:** `/flashcards`
 - **Główny cel:** Przeglądanie, edycja i zarządzanie wszystkimi fiszkami użytkownika
 - **Kluczowe informacje do wyświetlenia:**
@@ -81,6 +85,7 @@ Nawigacja realizowana jest przez topbar z Navigation Menu, który scrolluje wraz
   - Proper ARIA labeling dla edit mode
 
 ### Sesja Nauki
+
 - **Ścieżka widoku:** `/study`
 - **Główny cel:** Przeprowadzenie sesji nauki z wykorzystaniem algorytmu spaced repetition
 - **Kluczowe informacje do wyświetlenia:**
@@ -100,6 +105,7 @@ Nawigacja realizowana jest przez topbar z Navigation Menu, który scrolluje wraz
   - Data persistence dla przerwanych sesji
 
 ### Historia Generowań (Modal)
+
 - **Ścieżka widoku:** Modal otwierany przyciskiem "Historia" w topbar
 - **Główny cel:** Wyświetlenie historii poprzednich generowań AI z podstawowymi statystykami
 - **Kluczowe informacje do wyświetlenia:**
@@ -121,6 +127,7 @@ Nawigacja realizowana jest przez topbar z Navigation Menu, który scrolluje wraz
 ## 3. Mapa podróży użytkownika
 
 ### Główny przepływ użytkownika (Happy Path):
+
 1. **Wejście do aplikacji** → Przekierowanie do `/auth/login` jeśli niezalogowany
 2. **Logowanie/Rejestracja** → Walidacja danych → Przekierowanie do generowania AI (`/generate`)
 3. **Generowanie AI - Wklejanie tekstu** → Wpisanie/wklejenie tekstu (1000-10000 znaków)
@@ -133,12 +140,14 @@ Nawigacja realizowana jest przez topbar z Navigation Menu, który scrolluje wraz
 10. **Sesja nauki** → Navigation Menu → Algorytm spaced repetition
 
 ### Alternatywne przepływy:
+
 - **Ręczne tworzenie fiszek:** Generowanie AI → "Moje Fiszki" → "Dodaj fiszkę" → Formularz → Zapisz
 - **Historia generowań:** Dowolny widok → "Historia" w topbar → Modal z listą poprzednich sesji
 - **Edycja z generowania AI:** Po generowaniu → Inline editing propozycji → Bulk save
 - **Error handling:** Błąd API → Toast notification → Retry lub powrót do poprzedniego stanu
 
 ### Przepływ dla nowych użytkowników:
+
 1. **Pierwszy kontakt** → `/auth/register` → Formularz rejestracji
 2. **Potwierdzenie rejestracji** → Toast success → Auto-login → Generowanie AI
 3. **Onboarding** → Empty state z clear instructions w widoku generowania AI
@@ -148,6 +157,7 @@ Nawigacja realizowana jest przez topbar z Navigation Menu, który scrolluje wraz
 ## 4. Układ i struktura nawigacji
 
 ### Struktura nawigacji:
+
 - **Topbar Navigation Menu** (Shadcn/ui NavigationMenu)
   - Scrolluje wraz z contentem (nie sticky)
   - Trzy główne sekcje:
@@ -157,6 +167,7 @@ Nawigacja realizowana jest przez topbar z Navigation Menu, który scrolluje wraz
   - Brak breadcrumbs ani dodatkowych opcji użytkownika
 
 ### Zasady nawigacji:
+
 - **Active state** dla aktualnie wybranej sekcji
 - **Keyboard navigation** (Tab, Enter, Arrow keys)
 - **No-refresh navigation** - SPA routing
@@ -164,11 +175,13 @@ Nawigacja realizowana jest przez topbar z Navigation Menu, który scrolluje wraz
 - **Back button handling** - proper browser history
 
 ### Sesja Nauki - specjalna nawigacja:
+
 - **Dedicated route** (`/study`) dostępna z "Moje Fiszki"
 - **Exit confirmations** przy próbie opuszczenia w trakcie sesji
 - **Auto-return** do "Moje Fiszki" po zakończeniu sesji
 
 ### Unauthorized states:
+
 - **Redirect to login** dla wszystkich protected routes
 - **Preserve intended destination** w URL params dla post-login redirect
 - **Clear navigation state** po logout
@@ -176,52 +189,62 @@ Nawigacja realizowana jest przez topbar z Navigation Menu, który scrolluje wraz
 ## 5. Kluczowe komponenty
 
 ### FlashcardComponent (Reusable)
+
 - **Tryby wyświetlania:** Preview (generowanie AI), Edit (inline), List (moje fiszki), Study (sesja nauki)
 - **Funkcjonalności:** Flip animation, inline editing, selection state, progress tracking
 - **Props interface:** mode, flashcard data, callbacks, edit permissions
 
-### TextInputArea  
+### TextInputArea
+
 - **Specyficzne cechy:** Pole tekstowe z walidacją długości (1000-10000 znaków)
 - **Walidacja:** Real-time walidacja z komunikatami błędów
 - **Accessibility:** ARIA labels, proper focus management, validation messages
 
 ### BulkSaveButton
+
 - **Przyciski:** "Zapisz wszystkie", "Zapisz zaakceptowane"
 - **States:** Disabled gdy brak zaakceptowanych fiszek, loading podczas operacji API
 - **Funkcjonalności:** Bulk save management, progress feedback
 
 ### InlineEditor
+
 - **Activation:** Single-click z kursorem w miejscu kliknięcia
 - **Controls:** Save na Enter/blur, cancel na Escape
 - **Validation:** Real-time dla front (≤200 chars), back (≤500 chars)
 
 ### InlineConfirmation
+
 - **UI Pattern:** Zamiana przycisku "Usuń" na "Potwierdź/Anuluj"
 - **Timeout:** Auto-cancel po 10 sekundach bez interakcji
 - **States:** Pending, confirmed, cancelled
 
 ### ProgressIndicator
+
 - **AI Operations:** Prosty komunikat "Generowanie..." bez progress bar
 - **Bulk Operations:** Loading state z opcjonalnym licznikiem operacji
 - **Study Sessions:** Progress w sesji nauki z algorytmem
 
 ### ToastNotifications
+
 - **Typy:** Success, error, warning, info
 - **Positioning:** Top-right corner
 - **Auto-dismiss:** 5 sekund dla success, manual dismiss dla errors
 - **Accessibility:** Screen reader announcements
 
 ### NavigationMenu (Shadcn/ui)
+
 - **Layout:** Horizontal topbar z trzema sekcjami
 - **Active states:** Visual indication aktualnego widoku
 - **Responsive behavior:** Adaptacyjny layout
 
 ### AuthenticationForm
+
 - **Validation:** Real-time z clear error messages
 - **Security:** Password visibility toggle
 - **Submission:** Loading states z disabled form podczas API calls
 
 ### ErrorBoundary
+
 - **Fallback UI:** User-friendly error messages
 - **Recovery:** Retry mechanisms gdzie to możliwe
 - **Logging:** Error reporting bez ujawniania wrażliwych informacji

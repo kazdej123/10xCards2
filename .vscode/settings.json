@@ -3,5 +3,7 @@
   "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact", "astro"],
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit"
-  }
+  },
+  "vitest.enable": true,
+  "vitest.commandLine": "npm run test"
 }

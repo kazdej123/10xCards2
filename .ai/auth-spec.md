@@ -3,6 +3,7 @@
 ## 1. ARCHITEKTURA INTERFEJSU UŻYTKOWNIKA
 
 ### 1.1 Strony Astro
+
 - **Strona główna** (`src/pages/index.astro`):
   - Wyświetla tytuł aplikacji "10xCards.ai"
   - Dla niezalogowanych: przyciski "Logowanie" i "Rejestracja"
@@ -16,7 +17,8 @@
   - Formularz z polem email do wysłania linku resetującego
 
 ### 1.2 Komponenty React (`src/components/auth`)
-- **AuthButtons.tsx**: 
+
+- **AuthButtons.tsx**:
   - Wyświetla przyciski "Logowanie"/"Rejestracja" dla niezalogowanych
   - Wyświetla przycisk "Wyloguj" dla zalogowanych
 - **LoginForm.tsx**:
@@ -35,12 +37,14 @@
   - Po sukcesie: komunikat "Sprawdź email"
 
 ### 1.3 Zarządzanie stanem autoryzacji
+
 - **AuthStore** (Zustand):
   - Stan: `user: User | null`, `isLoading: boolean`
   - Akcje: `setUser`, `clearUser`, `checkAuth`
   - Inicjalizacja przy ładowaniu aplikacji przez sprawdzenie sesji Supabase
 
 ### 1.4 Walidacja i komunikaty błędów
+
 - **Walidacja po stronie klienta**:
   - Format email, min. 8 znaków hasła, zgodność haseł
 - **Komunikaty błędów z serwera**:
@@ -51,11 +55,12 @@
 ## 2. LOGIKA BACKENDOWA
 
 ### 2.1 Endpointy API (`src/pages/api/auth`)
+
 - **register.ts** - `POST /api/auth/register`
   - Input: `{ email: string, password: string, confirmPassword: string }`
   - Proces: `supabase.auth.signUp()` bez weryfikacji email (US-001)
   - Output: automatyczne zalogowanie, redirect do `/`
-- **login.ts** - `POST /api/auth/login`  
+- **login.ts** - `POST /api/auth/login`
   - Input: `{ email: string, password: string }`
   - Proces: `supabase.auth.signInWithPassword()`
   - Output: sesja, redirect do `/` (US-002)
@@ -68,21 +73,25 @@
   - Output: email z linkiem ważnym 24h
 
 ### 2.2 Walidacja danych (Zod)
+
 ```typescript
 // Schematy walidacji
-const registerSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8),
-  confirmPassword: z.string()
-}).refine(data => data.password === data.confirmPassword)
+const registerSchema = z
+  .object({
+    email: z.string().email(),
+    password: z.string().min(8),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword);
 
 const loginSchema = z.object({
   email: z.string().email(),
-  password: z.string().min(1)
-})
+  password: z.string().min(1),
+});
 ```
 
 ### 2.3 Middleware autoryzacyjne (`src/middleware/index.ts`)
+
 - **Chronione trasy**: `/api/flashcards/*`, `/api/study-sessions/*`
 - **Publiczne trasy**: `/`, `/login`, `/register`, `/reset-password`
 - **Proces**: sprawdzenie sesji Supabase, redirect do `/login` jeśli brak autoryzacji
@@ -90,6 +99,7 @@ const loginSchema = z.object({
 ## 3. SYSTEM AUTENTYKACJI – SUPABASE AUTH
 
 ### 3.1 Konfiguracja Supabase
+
 - **Wyłączenie weryfikacji email** (zgodnie z US-001)
 - **Konfiguracja resetowania hasła**: link ważny 24h (US-002B)
 - **Row Level Security (RLS)**:
@@ -97,12 +107,14 @@ const loginSchema = z.object({
   - `study_sessions.user_id = auth.uid()` (US-009)
 
 ### 3.2 Metody autentykacji
+
 - **Rejestracja**: `supabase.auth.signUp()` - natychmiastowa aktywacja
 - **Logowanie**: `supabase.auth.signInWithPassword()`
 - **Wylogowanie**: `supabase.auth.signOut()`
 - **Reset hasła**: `supabase.auth.resetPasswordForEmail()`
 
 ### 3.3 Integracja z aplikacją
+
 - **SSR**: sprawdzenie sesji w `index.astro` przed renderowaniem
 - **CSR**: AuthStore synchronizowany z sesjami Supabase
 - **Automatyczne przekierowania**: nieautoryzowani → `/login`
@@ -110,17 +122,20 @@ const loginSchema = z.object({
 ## 4. BEZPIECZEŃSTWO I ZABEZPIECZENIA
 
 ### 4.1 Implementacja US-009 (Bezpieczny dostęp)
+
 - **RLS w Supabase**: automatyczne filtrowanie danych po `user_id`
 - **Middleware**: weryfikacja sesji przed dostępem do chronionych zasobów
 - **Brak współdzielenia**: użytkownik widzi tylko swoje fiszki
 
 ### 4.2 Zabezpieczenia
+
 - **HTTPS**: wszystkie operacje po bezpiecznym połączeniu
 - **JWT**: automatyczne zarządzanie tokenami przez Supabase
 - **Walidacja**: server-side walidacja wszystkich inputów
 - **Error handling**: spójne komunikaty błędów bez ujawniania szczegółów technicznych
 
 ## 5. PODSUMOWANIE
+
 - **Frontend**: Astro 5 + React 19 z komponentami autoryzacyjnymi
 - **Backend**: Endpointy API w Astro z walidacją Zod
 - **Autentykacja**: Supabase Auth jako gotowe rozwiązanie

@@ -1,9 +1,11 @@
 # API Endpoint Implementation Plan: POST /api/flashcards
 
 ## 1. Przegląd punktu końcowego
+
 Celem endpointu jest masowe tworzenie fiszek (zarówno manualnych, jak i wygenerowanych przez AI) przypisanych do zalogowanego użytkownika.
 
 ## 2. Szczegóły żądania
+
 - Metoda HTTP: POST
 - URL: `/api/flashcards`
 - Nagłówki:
@@ -41,6 +43,7 @@ Celem endpointu jest masowe tworzenie fiszek (zarówno manualnych, jak i wygener
   - `FlashcardCreateDto` (pojedyncza fiszka wejściowa).
 
 ## 3. Szczegóły odpowiedzi
+
 - Kod statusu: 201 Created
 - Format odpowiedzi:
   ```json
@@ -62,6 +65,7 @@ Celem endpointu jest masowe tworzenie fiszek (zarówno manualnych, jak i wygener
 - Używany typ: `CreateFlashcardsResponseDto` zawierający `data: FlashcardDto[]`.
 
 ## 4. Przepływ danych
+
 1. Ekstrakcja instancji Supabase z `context.locals.supabase` w handlerze Astro.
 2. Weryfikacja sesji użytkownika; jeśli brak lub nieważny, zwróć 401 Unauthorized.
 3. Parsowanie i walidacja ciała żądania schematem Zod.
@@ -77,12 +81,14 @@ Celem endpointu jest masowe tworzenie fiszek (zarówno manualnych, jak i wygener
 8. Zwrócenie wstawionych rekordów jako odpowiedź.
 
 ## 5. Względy bezpieczeństwa
+
 - Uwierzytelnianie: wymaganie JWT z Supabase Auth.
 - Autoryzacja: przypisanie fiszek do `user_id` z tokena oraz weryfikacja własności `generation_id`.
 - Ochrona przed zbyt dużymi payloadami: limit wielkości tablicy (np. max 100 fiszek).
 - Użycie parametrów w Supabase SDK zapobiega SQL Injection.
 
 ## 6. Obsługa błędów
+
 - 400 Bad Request:
   - Nieprawidłowy JSON lub nieprzechodzący walidacji Zod.
   - Niespójność `source` i `generation_id` (wymagane dla AI, null dla manual).
@@ -96,12 +102,14 @@ Celem endpointu jest masowe tworzenie fiszek (zarówno manualnych, jak i wygener
   - Zwrócenie ogólnego komunikatu, szczegóły logowane po stronie serwera.
 
 ## 7. Rozważania dotyczące wydajności
+
 - Batch insert zamiast wielu pojedynczych zapytań.
 - Indeks na kolumnie `generation_id` w tabeli `flashcards`.
 - Ograniczenie maksymalnej liczby fiszek na jedno żądanie (max 100).
 - Monitoring latencji i liczby błędów endpointu.
 
 ## 8. Kroki wdrożenia
+
 1. Utworzyć plik `src/pages/api/flashcards.ts`.
 2. Zaimportować:
    - `z` z `zod`.
@@ -118,4 +126,4 @@ Celem endpointu jest masowe tworzenie fiszek (zarówno manualnych, jak i wygener
 5. (Opcjonalnie) Wyodrębnić logikę do `src/lib/services/flashcardService.ts` z metodą `createFlashcards(...)`.
 6. Napisać testy jednostkowe i integracyjne (można mockować Supabase).
 7. Dodać dokumentację w repozytorium (README lub `docs/endpoints.md`).
-8. Przeprowadzić code review, zmergować i wdrożyć przez CI/CD. 
+8. Przeprowadzić code review, zmergować i wdrożyć przez CI/CD.

@@ -1,6 +1,7 @@
 # REST API Plan
 
 ## 1. Resources
+
 - **Users** (`users` table managed by Supabase Auth)
 - **Flashcards** (`flashcards` table)
 - **Generations** (`generations` table)
@@ -11,6 +12,7 @@
 ### 2.1 Flashcards CRUD
 
 - **GET** `/api/flashcards`
+
   - Fetch a paginated list of flashcards for the authenticated user.
   - Query Parameters:
     - `page`: number (default: 1)
@@ -21,11 +23,13 @@
   - Response: `200 OK` `{ data: Flashcard[], pagination: { page, limit, total } }`, `401 Unauthorized`
 
 - **GET** `/api/flashcards/{id}`
+
   - Fetch a single flashcard by ID.
   - Path Parameters: `id: number`
   - Response: `200 OK` `{ id, front, back, source, generation_id, created_at, updated_at }`, `404 Not Found`, `401 Unauthorized`
 
 - **POST** `/api/flashcards`
+
   - Create one or more flashcards (manual or AI-generated).
   - Request Body:
     ```json
@@ -54,6 +58,7 @@
   - Response: `201 Created` `{ data: [{ id, front, back, source, generation_id, created_at, updated_at }] }`, `400 Bad Request`, `401 Unauthorized`
 
 - **PUT** `/api/flashcards/{id}`
+
   - Update an existing flashcard (manual or AI-generated).
   - Path Parameters: `id: number`
   - Request Body: `{ front?: string, back?: string }`
@@ -69,6 +74,7 @@
 ### 2.2 Generations
 
 - **POST** `/api/generations`
+
   - Initiate an AI generation of flashcard proposals.
   - Request Body:
     ```json
@@ -84,15 +90,14 @@
     ```json
     {
       "generation_id": 123,
-      "flashcard_proposals": [
-        { "front": "Generated Question", "back": "Generated Answer", "source": "ai-full" }
-      ],
+      "flashcard_proposals": [{ "front": "Generated Question", "back": "Generated Answer", "source": "ai-full" }],
       "generated_count": 5
     }
     ```
   - Errors: `400 Bad Request`, `503 Service Unavailable`, `401 Unauthorized`
 
 - **POST** `/api/generations/{generation_id}/flashcards`
+
   - Accept flashcard proposals from a generation (bulk flashcard creation).
   - Path Parameters: `generation_id: number`
   - Request Body:
@@ -101,7 +106,7 @@
       "flashcards": [
         {
           "front": "Generated Question",
-          "back": "Generated Answer", 
+          "back": "Generated Answer",
           "source": "ai-full"
         },
         {
@@ -117,6 +122,7 @@
   - Response: `201 Created` `{ data: [{ id, front, back, source, generation_id, created_at, updated_at }] }`, `400 Bad Request`, `404 Not Found`, `401 Unauthorized`
 
 - **GET** `/api/generations`
+
   - Fetch a paginated list of past generations for the authenticated user.
   - Query Parameters:
     - `page`: number (default: 1)
@@ -131,6 +137,7 @@
 ### 2.3 Generation Error Logs
 
 - **GET** `/api/generation_error_logs`
+
   - Fetch paginated generation error logs for the authenticated user.
   - Query Parameters: same as `/api/generations`.
   - Response: `200 OK` `{ data: [{ id, error_code, error_message, model, source_text_hash, source_text_length, created_at }], pagination: { page, limit, total } }`, `401 Unauthorized`
@@ -141,12 +148,14 @@
   - Response: `200 OK` `{ id, error_code, error_message, model, source_text_hash, source_text_length, created_at }`, `404 Not Found`, `401 Unauthorized`
 
 ## 3. Authentication and Authorization
+
 - All endpoints require `Authorization: Bearer <JWT>` header (except `/auth/*`).
 - Use Supabase JWT validation middleware.
 - Leverage PostgreSQL RLS policies:
   - `flashcards`, `generations`, `generation_error_logs` scoped to `auth.uid() = user_id`.
 
 ## 4. Validation and Business Logic
+
 - **Flashcards**: `front` ≤ 200 chars, `back` ≤ 500 chars.
 - **Generations**: `source_text` length between 1000 and 10000 chars.
 - **Endpoint differences**:
@@ -160,5 +169,6 @@
   5. User accepts, edits, or rejects flashcard proposals via `POST /api/generations/{generation_id}/flashcards`, which inserts final flashcards and updates the generation counts.
 
 ## 5. Pagination, Filtering, and Sorting
+
 - Use standard query parameters: `page`, `limit`, plus resource-specific filters.
 - Responses include `pagination: { page, limit, total }`.
