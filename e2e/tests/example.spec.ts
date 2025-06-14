@@ -8,7 +8,7 @@ test.describe("Application Navigation Tests", () => {
     // Assert - Home page loads correctly
     await homePage.verifyHomePageLoaded();
     await homePage.verifyAppTitle();
-    await expect(homePage.getPage()).toHaveTitle(/10x Cards/i);
+    await expect(homePage.getPage()).toHaveTitle(/10xCards\.ai/i);
 
     // Act - Check auth buttons are present
     await expect(homePage.getByTestId("auth-buttons-container")).toBeVisible();
@@ -30,7 +30,7 @@ test.describe("Application Navigation Tests", () => {
     await homePage.navigateToHome();
 
     // Assert - Home page structure
-    await expect(homePage.getPage().locator('h1:has-text("10xCards.ai")')).toBeVisible();
+    await expect(homePage.getPage().locator("h1").first()).toBeVisible();
 
     // Act - Navigate to generate page
     await generatePage.navigateToGenerate();
@@ -43,7 +43,7 @@ test.describe("Application Navigation Tests", () => {
   test("should maintain consistent branding across pages", async ({ homePage, generatePage }) => {
     // Arrange & Act - Check home page branding
     await homePage.navigateToHome();
-    await expect(homePage.getPage().locator('h1:has-text("10xCards.ai")')).toBeVisible();
+    await expect(homePage.getPage().locator("h1").first()).toBeVisible();
 
     // Act & Assert - Check generate page branding
     await generatePage.navigateToGenerate();

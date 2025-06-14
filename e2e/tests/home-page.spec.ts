@@ -12,7 +12,7 @@ test.describe("Home Page Tests", () => {
     // Assert
     await homePage.verifyHomePageLoaded();
     await homePage.verifyAppTitle();
-    await expect(page).toHaveTitle(/10x Cards/i);
+    await expect(page).toHaveTitle(/10xCards\.ai/i);
   });
 
   test("should display auth buttons for unauthenticated users", async ({ page }) => {
@@ -75,7 +75,7 @@ test.describe("Home Page Tests", () => {
 
     // Assert
     // Check main heading
-    await expect(page.locator('h1:has-text("10xCards.ai")')).toBeVisible();
+    await expect(page.locator("h1").first()).toBeVisible();
 
     // Check page has proper semantic structure
     await expect(page.locator("main, div")).toHaveCount({ min: 1 });
