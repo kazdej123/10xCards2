@@ -14,12 +14,29 @@ export function ResetPasswordForm() {
     setMessage(null);
     setIsLoading(true);
 
-    // Form submission will be handled later
-    // Simulate success for now
-    setTimeout(() => {
-      setMessage("Link do resetowania hasła został wysłany na Twój email");
+    try {
+      const formData = new FormData();
+      formData.append("email", email);
+
+      const response = await fetch("/api/auth/reset-password", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setMessage(data.message);
+        setEmail(""); // Clear form on success
+      } else {
+        setError(data.error || "Wystąpił błąd podczas wysyłania linku resetującego");
+      }
+    } catch (error) {
+      console.error("Reset password error:", error);
+      setError("Wystąpił błąd podczas wysyłania żądania");
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   return (
