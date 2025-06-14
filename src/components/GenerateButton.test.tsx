@@ -7,11 +7,19 @@ import { axe } from "jest-axe";
 import "jest-axe/extend-expect";
 
 describe("GenerateButton", () => {
-  const defaultProps = {
-    onClick: vi.fn(),
-    disabled: false,
-    isLoading: false,
+  let defaultProps: {
+    onClick: ReturnType<typeof vi.fn>;
+    disabled: boolean;
+    isLoading: boolean;
   };
+
+  beforeEach(() => {
+    defaultProps = {
+      onClick: vi.fn(),
+      disabled: false,
+      isLoading: false,
+    };
+  });
 
   it("renders with default text", () => {
     render(<GenerateButton {...defaultProps} />);
@@ -60,9 +68,10 @@ describe("GenerateButton", () => {
   it("has loading spinner when isLoading is true", () => {
     render(<GenerateButton {...defaultProps} isLoading={true} />);
 
-    // Better approach: use getByTestId or aria attributes instead of querySelector
     const button = screen.getByRole("button");
-    expect(button).toContainHTML("animate-spin");
+    // Test for Loader2 icon presence more reliably
+    expect(button.querySelector(".lucide-loader-circle")).toBeInTheDocument();
+    expect(button.querySelector(".animate-spin")).toBeInTheDocument();
   });
 
   it("maintains proper button styling", () => {
@@ -75,18 +84,19 @@ describe("GenerateButton", () => {
   });
 
   it("is keyboard accessible", () => {
-    const handleClick = vi.fn();
-    render(<GenerateButton {...defaultProps} onClick={handleClick} />);
+    render(<GenerateButton {...defaultProps} />);
 
     const button = screen.getByRole("button");
 
-    // Check if button is focusable
+    // Check if button is focusable (main requirement for keyboard accessibility)
     button.focus();
     expect(button).toHaveFocus();
 
-    // Test button responds to Space key (standard for buttons)
-    fireEvent.keyDown(button, { key: " ", code: "Space" });
-    // Note: Native button behavior should handle Space key
+    // Verify button is not explicitly removed from tab order
+    expect(button).not.toHaveAttribute("tabindex", "-1");
+
+    // Button element is naturally keyboard accessible
+    // Space and Enter keys are handled by browser natively
   });
 
   it("has proper ARIA attributes for screen readers", () => {
@@ -113,6 +123,30 @@ describe("GenerateButton", () => {
 
     const button = screen.getByRole("button");
     fireEvent.click(button);
+
+    expect(handleClick).not.toHaveBeenCalled();
+  });
+
+  it("has responsive width classes for mobile and desktop", () => {
+    render(<GenerateButton {...defaultProps} />);
+
+    const button = screen.getByRole("button");
+    // Test responsive design classes
+    expect(button).toHaveClass("w-full", "sm:w-auto");
+  });
+
+  it("prevents keyboard activation when disabled", () => {
+    const handleClick = vi.fn();
+    render(<GenerateButton {...defaultProps} onClick={handleClick} disabled={true} />);
+
+    const button = screen.getByRole("button");
+
+    // Test that disabled button cannot be focused/activated
+    expect(button).toBeDisabled();
+    expect(button).toHaveAttribute("disabled");
+
+    // Try keyboard interaction on disabled button
+    fireEvent.keyDown(button, { key: "Enter", code: "Enter" });
 
     expect(handleClick).not.toHaveBeenCalled();
   });
