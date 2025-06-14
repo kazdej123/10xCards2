@@ -3,18 +3,19 @@
 ## 1. Wprowadzenie i cele testowania
 
 ### 1.1 Wprowadzenie
-Niniejszy dokument przedstawia plan testów dla aplikacji internetowej 10xCards2. Aplikacja ta umożliwia użytkownikom generowanie, zarządzanie i udostępnianie zestawów fiszek edukacyjnych z wykorzystaniem technologii AI w oparciu o wybrany stos technologiczny. Projekt wykorzystuje technologie takie jak Astro, React, TypeScript, Zustand, Tailwind CSS oraz Supabase do autentykacji.
+Niniejszy dokument przedstawia plan testów dla aplikacji internetowej 10xCards2. Aplikacja ta umożliwia użytkownikom generowanie, zarządzanie zestawów fiszek edukacyjnych z wykorzystaniem technologii AI w oparciu o wybrany stos technologiczny. Projekt wykorzystuje technologie takie jak Astro 5, React 19, TypeScript 5, Tailwind 4, Shadcn/ui oraz Supabase do autentykacji i bazy danych.
 
 ### 1.2 Cele testowania
 Głównymi celami testowania projektu 10xCards2 są:
-- Weryfikacja zgodności funkcjonalnej aplikacji z jej przeznaczeniem (generowanie fiszek, zarządzanie kolekcjami, autentykacja, integracja z AI)
+- Weryfikacja zgodności funkcjonalnej aplikacji z jej przeznaczeniem (generowanie fiszek przez AI, ręczne zarządzanie fiszkami, autentykacja)
 - Zapewnienie wysokiej jakości i niezawodności aplikacji
 - Identyfikacja i raportowanie defektów w celu ich naprawy przed wdrożeniem
 - Ocena użyteczności i doświadczenia użytkownika (UX)
 - Weryfikacja poprawności działania aplikacji na różnych przeglądarkach i urządzeniach
 - Zapewnienie bezpieczeństwa danych użytkowników i procesów autentykacji
 - Weryfikacja poprawności integracji z usługami zewnętrznymi (Supabase, OpenRouter)
-- Potwierdzenie poprawności generowanych fiszek dla różnych środowisk AI
+- Potwierdzenie poprawności generowanych fiszek przez AI
+- Weryfikacja metryk sukcesu (75% akceptacji AI-generowanych fiszek, 75% użycia AI)
 
 ## 2. Zakres testów
 
@@ -32,19 +33,15 @@ Głównymi celami testowania projektu 10xCards2 są:
   - Dostępność (nawigacja klawiaturą, czytniki ekranu)
 
 - **Moduł Zarządzania Fiszkami (Flashcard Management)**:
-  - Wyświetlanie listy fiszek użytkownika
-  - Rozwijanie i zwijanie paska bocznego
-  - Wyświetlanie listy kolekcji użytkownika
-  - Sortowanie i filtrowanie kolekcji, podczas pobierania kolekcji
+  - Wyświetlanie listy fiszek użytkownika z paginacją
+  - Ręczne tworzenie nowych fiszek (formularz przód/tył)
+  - Edycja istniejących fiszek (formularz z walidacją)
+  - Usuwanie pojedynczych fiszek (z potwierdzeniem)
+  - Wyszukiwanie fiszek po zawartości
+  - Sortowanie i filtrowanie fiszek
+  - Organizacja fiszek w proste zestawy/kolekcje
   - Wyświetlanie informacji o konieczności zalogowania dla niezalogowanych użytkowników
-  - Tworzenie nowej kolekcji (dialog, walidacja, zapis przez API)
-  - Edycja nazwy/opisu kolekcji (dialog, zapis przez API, aktualizacja listy)
-  - Usuwanie kolekcji (dialog potwierdzający, usuwanie przez API, aktualizacja listy)
-  - Wybranie istniejącej kolekcji (ładowanie odpowiednich bibliotek do RuleBuilder, aktualizacja techStackStore)
-  - Edycja nazwy i opisu kolekcji (dialog, zapis przez API)
-  - Usuwanie kolekcji (dialog potwierdzający, usuwanie przez API, aktualizacja listy)
-  - Wylogowanie czysty listę kolekcji i resetuje stan original Libraries
-  - Obsługa dialogu niezapisanych zmian przy próbie przełączenia kolekcji lub tworzenia nowej
+  - Bulk operations - masowe operacje na fiszkach (opcjonalnie)
 
 - **Moduł Autentykacji**:
   - Formularz logowania (walidacja pól, proces logowania przez API, obsługa błędów, przekierowanie)
@@ -58,22 +55,22 @@ Głównymi celami testowania projektu 10xCards2 są:
 
 - **Moduł Responsywności i UI**:
   - Responsywność interfejsu użytkownika (Mobile, Tablet, Desktop)
-  - Wizualna integracja (Tailwind CSS, theming)
-  - Poprawność działania komponentów UI (Accordion, ConfirmDialog)
+  - Wizualna integracja (Tailwind 4, theming)
+  - Poprawność działania komponentów Shadcn/ui (Button, Dialog, Form, Input, Textarea)
   - Integracja z Supabase (Auth, Database API)
   - Obsługa błędów API i wyświetlanie komunikatów użytkownikom
-  - Dostępność (WCAG)
-  - Podstawowe testy bezpieczeństwa
+  - Dostępność (WCAG AA)
+  - Podstawowe testy bezpieczeństwa (OWASP Top 10)
 
 ## 3. Typy testów do przeprowadzenia
 W ramach projektu zostaną przeprowadzone następujące typy testów:
 
 - **Testy jednostkowe (Unit Tests)**:
-  - Cel: Weryfikacja poprawności działania izolowanych jednostek kodu (funkcje pomocnicze, logika store'ów Zustand, komponenty React z prostą logiką, logika parsowania zależności)
+  - Cel: Weryfikacja poprawności działania izolowanych jednostek kodu (funkcje pomocnicze, komponenty React z prostą logiką, walidatory formularzy, utility functions)
   - Narzędzia: Vitest, React Testing Library
 
 - **Testy integracyjne (Integration Tests)**:
-  - Cel: Weryfikacja współpracy między różnymi modułami i komponentami (np. RuleBuilder <-> RulePreview, komponenty UI <-> Store'y Zustand, komponenty <-> API Astro, API Astro <-> Supabase)
+  - Cel: Weryfikacja współpracy między różnymi modułami i komponentami (komponenty React <-> API Astro, API Astro <-> Supabase, API Astro <-> OpenRouter, komponenty UI flow)
   - Narzędzia: Vitest, React Testing Library, Mock Service Worker (MSW) do mockowania API
 
 - **Testy End-to-End (E2E Tests)**:
@@ -119,18 +116,15 @@ Poniżej przedstawiono przykładowe, wysokopoziomowe scenariusze testowe. Szczeg
 - **TC-FLASH-06**: Wyszukiwanie fiszek po zawartości
 - **TC-FLASH-07**: Organizacja fiszek w kolekcje
 
-### 4.3 Kolekcje (Zarządzanie kolekcjami):
+### 4.3 Zestawy fiszek (opcjonalnie w MVP):
 
-- **TC-COL-01**: Niezalogowany użytkownik widzi komunikat o konieczności logowania w pasku kolekcji
-- **TC-COL-02**: Zalogowany użytkownik widzi listę swoich kolekcji
-- **TC-COL-03**: Utworzenie nowej kolekcji (walidacja nazwy/opisu, zapis, pojawienie się na liście, automatyczne wybranie)
-- **TC-COL-04**: Wybranie istniejącej kolekcji ładuje jej biblioteki do RuleBuilder
-- **TC-COL-05**: Edycja nazwy/opisu kolekcji zapisuje zmiany i aktualizuje widok
-- **TC-COL-06**: Usunięcie kolekcji (potwierdzenie) usuwa ją z listy i resetuje selekcję wyboru
-- **TC-COL-07**: Modyfikacja wybranej kolekcji (dodanie/usunięcie bibliotek) aktywuje przycisk "Zapisz zmiany"
-- **TC-COL-08**: Zapisanie zmian aktualizuje kolekcję i resetuje stan "dirty"
-- **TC-COL-09**: Próba przełączenia na inną kolekcję przy niezapisanych zmianach wyświetla dialog (test opcji Zapisz/Porzuć/Anuluj)
-- **TC-COL-10**: Wylogowanie czyści listę kolekcji i resetuje stan
+- **TC-SET-01**: Utworzenie nowego zestawu fiszek (nazwa, opis)
+- **TC-SET-02**: Dodawanie fiszek do zestawu
+- **TC-SET-03**: Usuwanie fiszek z zestawu
+- **TC-SET-04**: Edycja nazwy/opisu zestawu
+- **TC-SET-05**: Usunięcie całego zestawu (z potwierdzeniem)
+- **TC-SET-06**: Wyświetlanie listy zestawów użytkownika
+- **TC-SET-07**: Filtrowanie i sortowanie zestawów
 
 ### 4.4 Autentykacja:
 
@@ -140,7 +134,7 @@ Poniżej przedstawiono przykładowe, wysokopoziomowe scenariusze testowe. Szczeg
 - **TC-AUTH-04**: Nieudana rejestracja (np. email zajęty, słabe hasło)
 - **TC-AUTH-05**: Pomyślne wylogowanie
 - **TC-AUTH-06**: Ochrona tras - próba dostępu do chronionych zasobów bez logowania przekierowuje na /auth/login
-- **TC-AUTH-07**: Ochrona API - próba dostępu do /api/collections bez logowania zwraca 401
+- **TC-AUTH-07**: Ochrona API - próba dostępu do /api/flashcards bez logowania zwraca 401
 - **TC-AUTH-08**: Zalogowany użytkownik próbujący wejść na /auth/login jest przekierowywany na /
 - **TC-AUTH-09**: Reset hasła - wysyłka emaila i proces zmiany hasła
 - **TC-AUTH-10**: Weryfikacja Row Level Security w Supabase
@@ -187,9 +181,10 @@ Poniżej przedstawiono przykładowe, wysokopoziomowe scenariusze testowe. Szczeg
 - Symulacja urządzeń mobilnych (Chrome DevTools) dla testów responsywności. W miarę możliwości testy na fizycznych urządzeniach (iOS, Android)
 
 ### Dane testowe:
-- Konta użytkowników testowych (różne role, jeśli dotyczy)
-- Przykładowe kolekcje fiszek
-- Przykładowe pliki dependencies (package.json, requirements.txt) z różnymi zestawami bibliotek, w tym rzadkimi i nieobsługiwanymi
+- Konta użytkowników testowych
+- Przykładowe zestawy fiszek
+- Przykładowe teksty do generacji fiszek (różne długości, języki, złożoność)
+- Przykładowe fiszki utworzone ręcznie i przez AI
 
 ## 6. Narzędzia do testowania
 
@@ -296,13 +291,16 @@ Regularne przeglądy błędów (Bug Triage) w celu priorytetyzacji i omówienia 
 6. Regularne review i aktualizacja statusów
 
 ## 11. Specjalne uwagi techniczne
-- **Astro Islands**: Szczególna uwaga na testowanie partial hydration i interakcji między wyspami
-- **Supabase RLS**: Weryfikacja Row Level Security dla każdego endpoint'u  
-- **OpenRouter**: Testowanie różnych modeli AI i ich responsów, handling quota limits
-- **Performance**: Monitorowanie Core Web Vitals, szczególnie dla generacji fiszek
-- **Security**: OWASP Top 10, sanityzacja input'ów, CSRF protection
-- **Cross-browser compatibility**: Szczególna uwaga na Safari i jego specyficzne zachowania
+- **Astro 5 Islands**: Szczególna uwaga na testowanie partial hydration i interakcji między wyspami React
+- **Supabase RLS**: Weryfikacja Row Level Security dla endpoint'ów fiszek użytkowników
+- **OpenRouter**: Testowanie różnych modeli AI, handling quota limits, rate limiting, timeout handling
+- **Performance**: Monitorowanie Core Web Vitals, szczególnie dla generacji fiszek i ładowania list
+- **Security**: OWASP Top 10, sanityzacja input'ów generacji AI, walidacja długości tekstu (1000-10000 znaków)
+- **Cross-browser compatibility**: Szczególna uwaga na Safari i jego specyficzne zachowania z Astro
 - **Mobile performance**: Testowanie na urządzeniach o ograniczonej mocy obliczeniowej
+- **Shadcn/ui**: Testowanie komponentów UI pod kątem dostępności i responsywności
+- **TypeScript 5**: Weryfikacja typów i zgodności z nowymi funkcjonalnościami
+- **React 19**: Testowanie nowych hook'ów i concurrent features
 
 ---
-*Dokument zaktualizowany z uwzględnieniem najlepszych praktyk testowania opartych na wzorcu 10xRules.ai oraz nowoczesnych technologii Astro/React.*
+*Dokument zaktualizowany zgodnie z aktualnym MVP, PRD i tech-stack projektu 10xCards2.*
