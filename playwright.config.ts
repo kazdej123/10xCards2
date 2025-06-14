@@ -2,6 +2,7 @@ import { defineConfig, devices } from "@playwright/test";
 import dotenv from "dotenv";
 import path from "path";
 
+// Load .env.test file for test environment variables (especially Supabase config)
 dotenv.config({ path: path.resolve(process.cwd(), ".env.test") });
 
 /**
@@ -51,7 +52,7 @@ export default defineConfig({
       teardown: "cleanup",
     },
 
-    // Cleanup project - opcjonalnie czyści po testach
+    // Database cleanup project - runs after all tests using project dependencies approach
     {
       name: "cleanup",
       testMatch: /.*\.cleanup\.ts/,
