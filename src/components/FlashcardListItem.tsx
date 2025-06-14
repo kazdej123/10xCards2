@@ -141,7 +141,7 @@ export function FlashcardListItem({ flashcard, onAccept, onEdit, onReject }: Fla
                 setEditedBack(flashcard.back);
                 setValidationError(null);
               }}
-              className="border-white/30 text-white hover:bg-white/10 hover:border-white/50"
+              className="bg-white/10 border border-white/30 text-white hover:bg-white/20 hover:border-white/50 transition-all duration-200 backdrop-blur-sm"
             >
               Anuluj
             </Button>
