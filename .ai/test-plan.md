@@ -43,8 +43,8 @@ Głównymi celami testowania projektu 10xCards2 są:
   - Formularz rejestracji (walidacja pól, proces rejestracji, obsługa błędów)
   - Formularz resetowania hasła (walidacja email, komunikat po wysłaniu)
   - Proces wylogowania (przez API, aktualizacja stanu authStore, przekierowanie)
-  - Ochrona tras - próba dostępu do /auth bez logowania przekierowuje na /auth/login
-  - Zalogowany użytkownik próbujący wejść na /auth/login jest przekierowywany na /
+  - Ochrona tras - próba dostępu do chronionych tras bez logowania przekierowuje na /login
+  - Zalogowany użytkownik próbujący wejść na /login jest przekierowywany na /
   - Poprawne wyświetlanie informacji o użytkowniku (email) w Topbar
   - Zarządzanie sesją użytkownika (ciasteczka Supabase)
 
@@ -116,9 +116,9 @@ Poniżej przedstawiono przykładowe, wysokopoziomowe scenariusze testowe. Szczeg
 - **TC-AUTH-03**: Pomyślna rejestracja nowego użytkownika
 - **TC-AUTH-04**: Nieudana rejestracja (np. email zajęty, słabe hasło)
 - **TC-AUTH-05**: Pomyślne wylogowanie
-- **TC-AUTH-06**: Ochrona tras - próba dostępu do chronionych zasobów bez logowania przekierowuje na /auth/login
+- **TC-AUTH-06**: Ochrona tras - próba dostępu do chronionych zasobów bez logowania przekierowuje na /login
 - **TC-AUTH-07**: Ochrona API - próba dostępu do /api/flashcards bez logowania zwraca 401
-- **TC-AUTH-08**: Zalogowany użytkownik próbujący wejść na /auth/login jest przekierowywany na /
+- **TC-AUTH-08**: Zalogowany użytkownik próbujący wejść na /login jest przekierowywany na /
 - **TC-AUTH-09**: Reset hasła - wysyłka emaila i proces zmiany hasła
 - **TC-AUTH-10**: Weryfikacja Row Level Security w Supabase
 
@@ -151,7 +151,7 @@ Poniżej przedstawiono przykładowe, wysokopoziomowe scenariusze testowe. Szczeg
 
 ### Środowiska:
 - **Lokalne (Developerskie)**: Używane przez deweloperów do testów jednostkowych i integracyjnych podczas rozwoju
-- **Testowe/Staging**: Dedykowane środowisko QA, odzwierciedlające środowisko produkcyjne. Powinno zawierać osobną instancję Supabase (lub dane testowe w głównej instancji oddzielone np. przez RLS). Używane do testów integracyjnych, E2E, manualnych, UAT
+- **Testowe/Staging**: Dedykowane środowisko QA, odzwierciedlające środowisko produkcyjne. Zalecane użycie jednej instancji Supabase z oddzieleniem danych testowych przez Row Level Security (RLS). Używane do testów integracyjnych, E2E, manualnych, UAT
 - **Produkcyjne**: Środowisko live. Ograniczone testy (smoke tests) po wdrożeniu
 
 ### Przeglądarki:
@@ -204,9 +204,12 @@ Poniżej przedstawiono przykładowe, wysokopoziomowe scenariusze testowe. Szczeg
 | Testy eksploracyjne i manualne   | 1.5 dnia       | QA Engineer |
 | Testy wydajności i bezpieczeństwa| 1 dzień        | QA Lead + DevOps |
 | Visual regression i accessibility| 1 dzień        | QA Engineer |
+| **Pierwszy cykl napraw**         | **2 dni**      | **Developers** |
+| **Retesty po naprawach**         | **1.5 dnia**   | **QA Engineer** |
 | Testy UAT                        | 1 dzień        | Product Owner |
+| **Drugi cykl napraw (opcjonalny)**| **1 dzień**   | **Developers** |
 | Raportowanie i zamknięcie        | 1 dzień        | QA Lead |
-| **RAZEM**                        | **13 dni**     | |
+| **RAZEM**                        | **18 dni**     | |
 
 ## 8. Kryteria akceptacji testów
 - Pokrycie testami jednostkowymi ≥ 90%
@@ -275,12 +278,43 @@ Regularne przeglądy błędów (Bug Triage) w celu priorytetyzacji i omówienia 
 - **Supabase RLS**: Weryfikacja Row Level Security dla endpoint'ów fiszek użytkowników
 - **OpenRouter**: Testowanie różnych modeli AI, handling quota limits, rate limiting, timeout handling
 - **Performance**: Monitorowanie Core Web Vitals, szczególnie dla generacji fiszek i ładowania list
+  - Target metrics: LCP < 2.5s, FID < 100ms, CLS < 0.1
+  - Generacja fiszek AI: timeout 60s, target response time < 30s
+  - Ładowanie listy fiszek: target < 1s dla 100 elementów
 - **Security**: OWASP Top 10, sanityzacja input'ów generacji AI, walidacja długości tekstu (1000-10000 znaków)
+  - Input validation: XSS prevention, SQL injection protection
+  - Authentication: JWT token validation, session management
+  - Authorization: RLS policies verification, API endpoint protection
+  - Data privacy: User data isolation, secure data transmission (HTTPS)
 - **Cross-browser compatibility**: Szczególna uwaga na Safari i jego specyficzne zachowania z Astro
 - **Mobile performance**: Testowanie na urządzeniach o ograniczonej mocy obliczeniowej
 - **Shadcn/ui**: Testowanie komponentów UI pod kątem dostępności i responsywności
 - **TypeScript 5**: Weryfikacja typów i zgodności z nowymi funkcjonalnościami
 - **React 19**: Testowanie nowych hook'ów i concurrent features
+
+## 12. Strategia testowania AI (AI Testing Strategy)
+
+### Mockowanie vs rzeczywiste API:
+- **Testy jednostkowe i integracyjne**: Mockowanie OpenRouter API za pomocą MSW (Mock Service Worker)
+- **Testy E2E**: Użycie rzeczywistego OpenRouter API z ograniczonym budżetem testowym
+- **Development**: Kombinacja mock'ów i rzeczywistego API w zależności od potrzeb
+
+### Testowanie różnych scenariuszy AI:
+- **Timeout handling**: Testowanie zachowania przy przekroczeniu 60-sekundowego limitu
+- **Rate limiting**: Obsługa błędów quota exceeded i rate limit
+- **Error codes**: Testowanie różnych kodów błędów OpenRouter (400, 429, 503)
+- **Model availability**: Testowanie zachowania przy niedostępności wybranego modelu AI
+- **Response validation**: Weryfikacja struktury i jakości odpowiedzi AI
+
+### Dane testowe dla AI:
+- Przygotowanie zestawu tekstów testowych różnej długości (1000-10000 znaków)
+- Teksty w różnych językach i domenach (nauka, historia, nauki ścisłe)
+- Edge cases: teksty z specjalnymi znakami, formatowaniem, długie akapity
+
+### Metryki jakości AI:
+- Monitoring czasu odpowiedzi generacji fiszek
+- Śledzenie współczynnika sukcesu wywołań API
+- Analiza jakości generowanych fiszek (czy są sensowne jako pytania/odpowiedzi)
 
 ---
 *Dokument zaktualizowany zgodnie z aktualnym MVP, PRD i tech-stack projektu 10xCards2.*
