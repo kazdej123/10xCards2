@@ -1,19 +1,21 @@
 import type { SupabaseClient } from "../../db/supabase.client";
 import type { FlashcardProposalDto, GenerationCreateResponseDto } from "../../types";
-import { DEFAULT_USER_ID } from "../../db/supabase.client";
 import { OpenRouterService } from "./openRouterService";
 import crypto from "crypto";
 
 export class GenerationService {
   private readonly openRouterService: OpenRouterService;
+  private readonly userId: string;
 
   constructor(
     private readonly supabase: SupabaseClient,
-    openRouterApiKey: string
+    openRouterApiKey: string,
+    userId: string
   ) {
     this.openRouterService = new OpenRouterService({
       apiKey: openRouterApiKey,
     });
+    this.userId = userId;
 
     // Configure the OpenRouter service for flashcard generation
     this.setupOpenRouterService();
@@ -123,27 +125,35 @@ Generate flashcards that capture the most important concepts, facts, and relatio
       }
 
       const content = response.choices[0].message.content;
+
       if (!content) {
         throw new Error("Empty response from AI service");
       }
 
       // Parse JSON response
-      const parsedResponse = JSON.parse(content);
+      try {
+        const parsedResponse = JSON.parse(content);
 
-      if (!parsedResponse.flashcards || !Array.isArray(parsedResponse.flashcards)) {
-        throw new Error("Invalid response format from AI service");
+        if (!parsedResponse.flashcards || !Array.isArray(parsedResponse.flashcards)) {
+          throw new Error("Invalid response format from AI service");
+        }
+
+        // Convert to FlashcardProposalDto format
+        const flashcardProposals: FlashcardProposalDto[] = parsedResponse.flashcards.map(
+          (card: { front: string; back: string }) => ({
+            front: card.front,
+            back: card.back,
+            source: "ai-full" as const,
+          })
+        );
+
+        return flashcardProposals;
+      } catch (error) {
+        if (error instanceof SyntaxError) {
+          throw new Error("Invalid JSON response from AI service");
+        }
+        throw error;
       }
-
-      // Convert to FlashcardProposalDto format
-      const flashcardProposals: FlashcardProposalDto[] = parsedResponse.flashcards.map(
-        (card: { front: string; back: string }) => ({
-          front: card.front,
-          back: card.back,
-          source: "ai-full" as const,
-        })
-      );
-
-      return flashcardProposals;
     } catch (error) {
       throw new Error(`Failed to generate flashcards: ${error instanceof Error ? error.message : "Unknown error"}`);
     }
@@ -158,7 +168,7 @@ Generate flashcards that capture the most important concepts, facts, and relatio
     const { data: generation, error } = await this.supabase
       .from("generations")
       .insert({
-        user_id: DEFAULT_USER_ID,
+        user_id: this.userId,
         source_text_hash: data.sourceTextHash,
         source_text_length: data.sourceTextLength,
         generated_count: data.generatedCount,
@@ -168,7 +178,10 @@ Generate flashcards that capture the most important concepts, facts, and relatio
       .select("id")
       .single();
 
-    if (error) throw error;
+    if (error) {
+      throw error;
+    }
+
     return generation.id;
   }
 
@@ -180,7 +193,7 @@ Generate flashcards that capture the most important concepts, facts, and relatio
     }
   ): Promise<void> {
     await this.supabase.from("generation_error_logs").insert({
-      user_id: DEFAULT_USER_ID,
+      user_id: this.userId,
       error_code: error instanceof Error ? error.name : "UNKNOWN",
       error_message: error instanceof Error ? error.message : String(error),
       model: "openai/gpt-4o-mini", // Updated to match the actual model being used

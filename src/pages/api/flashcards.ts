@@ -1,7 +1,6 @@
 import { z } from "zod";
 import type { APIRoute } from "astro";
 import type { FlashcardsCreateCommand, FlashcardDto, CreateFlashcardsResponseDto, FlashcardInsert } from "../../types";
-import { DEFAULT_USER_ID } from "../../db/supabase.client";
 
 export const prerender = false;
 
@@ -34,6 +33,20 @@ const flashcardsCreateCommandSchema = z.object({
 
 export const POST: APIRoute = async ({ request, locals }) => {
   try {
+    // Check if user is authenticated
+    if (!locals.user) {
+      return new Response(
+        JSON.stringify({
+          error: "Authentication required",
+          message: "You must be logged in to create flashcards",
+        }),
+        {
+          status: 401,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
+
     // 1. Parse and validate input
     const body = (await request.json()) as FlashcardsCreateCommand;
     const result = flashcardsCreateCommandSchema.safeParse(body);
@@ -53,6 +66,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
     const command = result.data as FlashcardsCreateCommand;
     const { supabase } = locals;
+    const userId = locals.user.id;
 
     // Collect unique generation IDs from AI-generated flashcards
     const aiGenerationIds = [
@@ -68,7 +82,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
       const { data: generations, error: generationsError } = await supabase
         .from("generations")
         .select("id")
-        .eq("user_id", DEFAULT_USER_ID)
+        .eq("user_id", userId)
         .in("id", aiGenerationIds);
 
       if (generationsError) {
@@ -91,7 +105,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
     // Prepare records for insertion
     const flashcardsToInsert: FlashcardInsert[] = command.flashcards.map((flashcard) => ({
-      user_id: DEFAULT_USER_ID,
+      user_id: userId,
       front: flashcard.front,
       back: flashcard.back,
       source: flashcard.source,

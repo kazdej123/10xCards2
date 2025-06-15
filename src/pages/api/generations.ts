@@ -15,6 +15,20 @@ const generateFlashcardsSchema = z.object({
 
 export const POST: APIRoute = async ({ request, locals }) => {
   try {
+    // Check if user is authenticated
+    if (!locals.user) {
+      return new Response(
+        JSON.stringify({
+          error: "Authentication required",
+          message: "You must be logged in to generate flashcards",
+        }),
+        {
+          status: 401,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
+
     // Check if OpenRouter API key is configured
     const openRouterApiKey = import.meta.env.OPENROUTER_API_KEY;
     if (!openRouterApiKey) {
@@ -47,8 +61,8 @@ export const POST: APIRoute = async ({ request, locals }) => {
       );
     }
 
-    // 2. Generate flashcards using service
-    const generationService = new GenerationService(locals.supabase, openRouterApiKey);
+    // 2. Generate flashcards using service with authenticated user ID
+    const generationService = new GenerationService(locals.supabase, openRouterApiKey, locals.user.id);
     const response = await generationService.generateFlashcards(result.data.source_text);
 
     return new Response(JSON.stringify(response), {
