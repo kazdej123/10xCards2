@@ -1,9 +1,8 @@
 import { defineConfig, devices } from "@playwright/test";
-import dotenv from "dotenv";
-import path from "path";
+import { loadTestEnv } from "./e2e/fixtures/env-validator";
 
 // Load .env.test file for test environment variables (especially Supabase config)
-dotenv.config({ path: path.resolve(process.cwd(), ".env.test") });
+loadTestEnv();
 
 /**
  * @see https://playwright.dev/docs/test-configuration

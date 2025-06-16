@@ -1,3 +1,5 @@
+import { loadTestEnv, validateEnvVars, debugTestEnvironment } from "./env-validator";
+
 /**
  * Global setup that runs before all tests
  * Useful for database seeding, authentication, etc.
@@ -6,7 +8,18 @@ async function globalSetup() {
   // eslint-disable-next-line no-console
   console.log("🔧 Running global setup...");
 
-  // 1. Check if development server is running
+  // 1. Load and validate environment variables
+  try {
+    loadTestEnv();
+    validateEnvVars();
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error("❌ Environment validation failed:", error);
+    debugTestEnvironment();
+    throw error;
+  }
+
+  // 2. Check if development server is running
   try {
     const response = await fetch("http://localhost:3000");
     if (!response.ok) {
