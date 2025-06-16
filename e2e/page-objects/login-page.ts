@@ -60,16 +60,25 @@ export class LoginPage extends BasePage {
       },
     });
 
-    expect(response.ok()).toBeTruthy();
+    // Szczegółowa walidacja odpowiedzi
+    expect(response.status()).toBe(200);
+    expect(response.headers()["content-type"]).toContain("application/json");
 
     const responseData = await response.json();
 
-    // Jeśli API zwraca token lub inne dane autoryzacyjne,
-    // można je wykorzystać do ustawienia stanu sesji
-    if (responseData.token) {
+    // Walidacja struktury odpowiedzi
+    expect(responseData).toHaveProperty("token");
+    expect(responseData).toHaveProperty("user");
+    expect(typeof responseData.token).toBe("string");
+    expect(responseData.token.length).toBeGreaterThan(0);
+
+    // Bezpieczne ustawienie tokena
+    if (responseData.token && typeof responseData.token === "string") {
       await this.page.evaluate((token) => {
         localStorage.setItem("authToken", token);
       }, responseData.token);
+    } else {
+      throw new Error("Invalid token received from API");
     }
 
     return responseData;

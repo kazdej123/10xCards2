@@ -36,8 +36,14 @@ test.describe("Strony publiczne - Nieuwierzytelniony użytkownik", () => {
     await page.goto("/dashboard");
 
     // Assert - powinniśmy zostać przekierowani do logowania
-    await expect(page).toHaveURL(/login/);
+    await expect(page).toHaveURL(/\/login/);
     await expect(page.getByTestId("login-form")).toBeVisible();
+
+    // Dodatkowo sprawdź komunikat o konieczności logowania
+    const loginTitle = page.getByTestId("login-title");
+    if (await loginTitle.isVisible()) {
+      await expect(loginTitle).toContainText(/zaloguj|login/i);
+    }
   });
 
   test("powinien umożliwić logowanie przez UI", async ({ page }) => {

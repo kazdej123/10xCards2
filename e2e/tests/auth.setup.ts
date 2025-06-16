@@ -10,10 +10,14 @@ const __dirname = path.dirname(__filename);
 // Ścieżka do pliku ze stanem uwierzytelniania
 const authFile = path.join(__dirname, "../.auth/user.json");
 
-// Dane użytkownika testowego (można przenieść do zmiennych środowiskowych)
+// Dane użytkownika testowego - WYMAGANE zmienne środowiskowe
+if (!process.env.TEST_USER_EMAIL || !process.env.TEST_USER_PASSWORD) {
+  throw new Error("TEST_USER_EMAIL and TEST_USER_PASSWORD environment variables are required");
+}
+
 const TEST_USER = {
-  email: process.env.TEST_USER_EMAIL || "test@example.com",
-  password: process.env.TEST_USER_PASSWORD || "testpassword123",
+  email: process.env.TEST_USER_EMAIL,
+  password: process.env.TEST_USER_PASSWORD,
 };
 
 setup("authenticate user", async ({ page }) => {
@@ -57,9 +61,13 @@ setup("authenticate user", async ({ page }) => {
 // Dodatkowy setup dla testów wymagających specjalnych uprawnień
 const adminAuthFile = path.join(__dirname, "../.auth/admin.json");
 
+if (!process.env.ADMIN_USER_EMAIL || !process.env.ADMIN_USER_PASSWORD) {
+  throw new Error("ADMIN_USER_EMAIL and ADMIN_USER_PASSWORD environment variables are required");
+}
+
 const ADMIN_USER = {
-  email: process.env.ADMIN_USER_EMAIL || "admin@example.com",
-  password: process.env.ADMIN_USER_PASSWORD || "adminpassword123",
+  email: process.env.ADMIN_USER_EMAIL,
+  password: process.env.ADMIN_USER_PASSWORD,
 };
 
 setup("authenticate admin", async ({ page }) => {
