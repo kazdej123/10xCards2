@@ -9,7 +9,6 @@ test.describe("Environment Variables Validation", () => {
 
     // Przykład pobierania opcjonalnych zmiennych z wartościami domyślnymi
     const useApiLogin = getOptionalEnvVar("USE_API_LOGIN", "true");
-    const supabaseUrl = getOptionalEnvVar("SUPABASE_URL", "");
 
     // Walidacje
     expect(testUserEmail).toBeTruthy();

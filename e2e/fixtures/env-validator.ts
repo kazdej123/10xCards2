@@ -201,6 +201,7 @@ export function debugTestEnvironment(): void {
 
   const envFile = path.resolve(process.cwd(), ".env.test");
   try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const fs = require("fs");
     const exists = fs.existsSync(envFile);
     // eslint-disable-next-line no-console
