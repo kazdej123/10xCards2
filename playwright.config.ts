@@ -112,6 +112,14 @@ export default defineConfig({
     url: "http://localhost:3000",
     reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000,
+    env: {
+      // Przekaż wszystkie zmienne środowiskowe do dev server
+      ...process.env,
+      // Upewnij się, że te kluczowe zmienne są ustawione
+      SUPABASE_URL: process.env.SUPABASE_URL || "",
+      SUPABASE_KEY: process.env.SUPABASE_KEY || "",
+      NODE_ENV: process.env.NODE_ENV || "test",
+    },
   },
 
   /* Output directories */

@@ -50,7 +50,7 @@ const E2E_ENV_VARS: RequiredEnvVars = {
     example: "https://your-project.supabase.co",
     sensitive: false,
   },
-  SUPABASE_ANON_KEY: {
+  SUPABASE_KEY: {
     required: false,
     description: "Klucz anonimowy Supabase",
     example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",

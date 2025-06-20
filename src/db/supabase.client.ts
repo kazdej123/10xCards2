@@ -6,6 +6,29 @@ import type { Database } from "./database.types";
 const supabaseUrl = import.meta.env.SUPABASE_URL;
 const supabaseKey = import.meta.env.SUPABASE_KEY;
 
+// Debug information in test environment
+if (import.meta.env.MODE === "test" || process.env.NODE_ENV === "test") {
+  // eslint-disable-next-line no-console
+  console.log("🐛 Supabase client debug info:");
+  // eslint-disable-next-line no-console
+  console.log(`   SUPABASE_URL: ${supabaseUrl ? "SET (****)" : "NOT SET"}`);
+  // eslint-disable-next-line no-console
+  console.log(`   SUPABASE_KEY: ${supabaseKey ? "SET (****)" : "NOT SET"}`);
+  // eslint-disable-next-line no-console
+  console.log(`   MODE: ${import.meta.env.MODE}`);
+  // eslint-disable-next-line no-console
+  console.log(`   NODE_ENV: ${process.env.NODE_ENV}`);
+}
+
+// Validate required environment variables
+if (!supabaseUrl) {
+  throw new Error("SUPABASE_URL is required. Please set it in your environment variables or .env file.");
+}
+
+if (!supabaseKey) {
+  throw new Error("SUPABASE_KEY is required. Please set it in your environment variables or .env file.");
+}
+
 export const cookieOptions: CookieOptionsWithName = {
   path: "/",
   secure: false, // Set to false for localhost
