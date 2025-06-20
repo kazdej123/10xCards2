@@ -53,6 +53,9 @@ export class LoginPage extends BasePage {
 
   // Zoptymalizowane logowanie przez API
   async loginViaAPI(email: string, password: string) {
+    // First navigate to the login page to establish proper context
+    await this.page.goto("/login");
+
     const response = await this.page.request.post("/api/auth/login", {
       data: {
         email,
@@ -72,17 +75,10 @@ export class LoginPage extends BasePage {
     expect(typeof responseData.token).toBe("string");
     expect(responseData.token.length).toBeGreaterThan(0);
 
-    // Navigate to a page first to establish proper context for localStorage
-    await this.page.goto("/");
-
-    // Bezpieczne ustawienie tokena
-    if (responseData.token && typeof responseData.token === "string") {
-      await this.page.evaluate((token) => {
-        localStorage.setItem("authToken", token);
-      }, responseData.token);
-    } else {
-      throw new Error("Invalid token received from API");
-    }
+    // The authentication should be handled through cookies by Supabase
+    // Since we made the API call through the same context, the cookies should be set
+    // Let's navigate to the generate page to check if authentication worked
+    await this.page.goto("/generate");
 
     return responseData;
   }

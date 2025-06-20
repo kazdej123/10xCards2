@@ -20,9 +20,8 @@ test.describe("Application Navigation Tests", () => {
     // Arrange & Act
     await generatePage.navigateToGenerate();
 
-    // Assert
-    await generatePage.verifyGeneratePageLoaded();
-    await expect(generatePage.getPage()).toHaveTitle(/Generuj fiszki/i);
+    // Assert - should redirect to login for unauthenticated users
+    await expect(generatePage.getPage()).toHaveURL(/login/);
   });
 
   test("should display proper page structure across pages", async ({ homePage, generatePage }) => {
@@ -32,12 +31,12 @@ test.describe("Application Navigation Tests", () => {
     // Assert - Home page structure
     await expect(homePage.getPage().locator("h1").first()).toBeVisible();
 
-    // Act - Navigate to generate page
+    // Act - Navigate to generate page (will redirect to login)
     await generatePage.navigateToGenerate();
 
-    // Assert - Generate page structure
-    await expect(generatePage.getPage().locator('h1:has-text("Generuj fiszki")')).toBeVisible();
-    await expect(generatePage.getByTestId("flashcard-generation-view")).toBeVisible();
+    // Assert - Should be redirected to login page
+    await expect(generatePage.getPage()).toHaveURL(/login/);
+    await expect(generatePage.getPage().getByTestId("login-form")).toBeVisible();
   });
 
   test("should maintain consistent branding across pages", async ({ homePage, generatePage }) => {

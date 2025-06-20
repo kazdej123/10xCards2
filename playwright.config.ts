@@ -48,7 +48,6 @@ export default defineConfig({
     {
       name: "setup",
       testMatch: /.*\.setup\.ts/,
-      teardown: "cleanup",
     },
 
     // Database cleanup project - runs after all tests using project dependencies approach
@@ -71,6 +70,7 @@ export default defineConfig({
         "**/user.authenticated.spec.ts",
       ],
       dependencies: ["setup"],
+      teardown: "cleanup",
     },
 
     // Testing project z uwierzytelnionym administratorem
@@ -83,6 +83,7 @@ export default defineConfig({
       },
       testMatch: ["**/admin.authenticated.spec.ts"],
       dependencies: ["setup"],
+      teardown: "cleanup",
     },
 
     // Testing project bez uwierzytelniania (dla testów publicznych stron)

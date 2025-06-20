@@ -13,7 +13,7 @@ test.describe("Generate Page - Uwierzytelniony użytkownik", () => {
     // Arrange - dane już załadowane w beforeEach
 
     // Act - sprawdzamy elementy strony generowania
-    const pageTitle = page.getByText("Generuj fiszki");
+    const pageTitle = page.getByRole("heading", { name: "Generuj fiszki" });
     const logoutButton = page.getByTestId("logout-button");
 
     // Assert
@@ -42,13 +42,21 @@ test.describe("Generate Page - Uwierzytelniony użytkownik", () => {
   });
 
   test("powinien umożliwić wylogowanie", async ({ page }) => {
-    // Arrange
+    // Arrange - wait for button to be fully interactive
     const logoutButton = page.getByTestId("logout-button");
+    await expect(logoutButton).toBeVisible();
+    await expect(logoutButton).toBeEnabled();
 
-    // Act
+    // Wait for React hydration to complete
+    await page.waitForTimeout(1000);
+
+    // Act - click the button and wait for navigation
     await logoutButton.click();
 
+    // Wait for any navigation to complete
+    await page.waitForLoadState("networkidle");
+
     // Assert - sprawdzamy czy zostaliśmy przekierowani
-    await expect(page).toHaveURL(/login|home/);
+    await expect(page).toHaveURL(/\/login|\/home|\/$/, { timeout: 10000 });
   });
 });

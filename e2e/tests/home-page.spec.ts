@@ -78,7 +78,8 @@ test.describe("Home Page Tests", () => {
     await expect(page.locator("h1").first()).toBeVisible();
 
     // Check page has proper semantic structure
-    await expect(page.locator("main, div")).toHaveCount({ min: 1 });
+    const mainElements = page.locator("main, div");
+    await expect(mainElements.first()).toBeVisible();
 
     // Check navigation elements are accessible
     const loginButton = page.getByTestId("login-button");
@@ -88,7 +89,7 @@ test.describe("Home Page Tests", () => {
     await expect(registerButton).toBeEnabled();
 
     // Check buttons have proper href attributes
-    await expect(loginButton.locator("a")).toHaveAttribute("href", "/login");
-    await expect(registerButton.locator("a")).toHaveAttribute("href", "/register");
+    await expect(loginButton).toHaveAttribute("href", "/login");
+    await expect(registerButton).toHaveAttribute("href", "/register");
   });
 });

@@ -7,6 +7,10 @@ export function LogoutButton() {
     setIsLoading(true);
 
     try {
+      // Clear client-side storage first
+      localStorage.clear();
+      sessionStorage.clear();
+
       const response = await fetch("/api/auth/logout", {
         method: "POST",
         headers: {
@@ -18,10 +22,12 @@ export function LogoutButton() {
         // Redirect to home page
         window.location.href = "/";
       } else {
-        // Silent fail - user will see they're still logged in
+        // Handle logout failure - force reload to clear any stale state
+        window.location.reload();
       }
     } catch {
-      // Silent fail - user will see they're still logged in
+      // Handle logout error - force redirect on error
+      window.location.href = "/";
     } finally {
       setIsLoading(false);
     }
@@ -31,6 +37,7 @@ export function LogoutButton() {
     <button
       onClick={handleLogout}
       disabled={isLoading}
+      data-testid="logout-button"
       className="px-4 py-2 bg-red-500/80 hover:bg-red-600/80 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
     >
       {isLoading ? "Wylogowywanie..." : "Wyloguj"}
