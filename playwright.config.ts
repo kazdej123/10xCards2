@@ -4,6 +4,20 @@ import { loadTestEnv } from "./e2e/fixtures/env-validator";
 // Load .env.test file for test environment variables (especially Supabase config)
 loadTestEnv();
 
+// Debug information in CI environment
+if (process.env.CI) {
+  // eslint-disable-next-line no-console
+  console.log("🐛 Playwright config debug info:");
+  // eslint-disable-next-line no-console
+  console.log(`   SUPABASE_URL: ${process.env.SUPABASE_URL ? "SET (****)" : "NOT SET"}`);
+  // eslint-disable-next-line no-console
+  console.log(`   SUPABASE_KEY: ${process.env.SUPABASE_KEY ? "SET (****)" : "NOT SET"}`);
+  // eslint-disable-next-line no-console
+  console.log(`   NODE_ENV: ${process.env.NODE_ENV}`);
+  // eslint-disable-next-line no-console
+  console.log(`   CI: ${process.env.CI}`);
+}
+
 /**
  * @see https://playwright.dev/docs/test-configuration
  */

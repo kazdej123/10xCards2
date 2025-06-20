@@ -23,6 +23,16 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Create .env.test file
+        run: |
+          echo "SUPABASE_URL=${{ secrets.SUPABASE_URL }}" > .env.test
+          echo "SUPABASE_KEY=${{ secrets.SUPABASE_KEY }}" >> .env.test
+          echo "NODE_ENV=test" >> .env.test
+          echo "TEST_USER_EMAIL=test@example.com" >> .env.test
+          echo "TEST_USER_PASSWORD=testpassword123" >> .env.test
+          echo "ADMIN_USER_EMAIL=admin@example.com" >> .env.test
+          echo "ADMIN_USER_PASSWORD=adminpassword123" >> .env.test
+
       - name: Install Playwright Browsers
         run: npx playwright install chromium
 

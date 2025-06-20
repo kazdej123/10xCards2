@@ -89,6 +89,17 @@ jobs:
           rm -rf node_modules package-lock.json
           npm install
 
+      - name: Create .env.test file
+        run: |
+          echo "SUPABASE_URL=${{ secrets.SUPABASE_URL }}" > .env.test
+          echo "SUPABASE_KEY=${{ secrets.SUPABASE_KEY }}" >> .env.test
+          echo "SUPABASE_SERVICE_ROLE_KEY=${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" >> .env.test
+          echo "NODE_ENV=test" >> .env.test
+          echo "TEST_USER_EMAIL=test@example.com" >> .env.test
+          echo "TEST_USER_PASSWORD=testpassword123" >> .env.test
+          echo "ADMIN_USER_EMAIL=admin@example.com" >> .env.test
+          echo "ADMIN_USER_PASSWORD=adminpassword123" >> .env.test
+
       - name: Install Playwright browsers
         run: npx playwright install chromium
 
