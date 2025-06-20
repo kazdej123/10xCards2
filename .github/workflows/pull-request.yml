@@ -2,7 +2,7 @@ name: Pull Request Validation
 
 on:
   pull_request:
-    branches: [ master ]
+    branches: [master]
 
 jobs:
   lint:
@@ -13,19 +13,19 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version-file: '.nvmrc'
-          cache: 'npm'
-          
+          node-version-file: ".nvmrc"
+          cache: "npm"
+
       - name: Install dependencies
         run: npm ci --force
-        
+
       - name: Run linter
         run: npm run lint
-        
+
       - name: Check formatting
         run: npm run format -- --check
 
@@ -38,24 +38,24 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version-file: '.nvmrc'
-          cache: 'npm'
-          
+          node-version-file: ".nvmrc"
+          cache: "npm"
+
       - name: Clean install dependencies
         run: |
           rm -rf node_modules package-lock.json
           npm install
-        
+
       - name: Run unit tests
         run: npm run test:run
-        
+
       - name: Generate coverage report
         run: npm run test:coverage
-        
+
       - name: Upload coverage reports
         uses: actions/upload-artifact@v4
         if: always()
@@ -77,24 +77,24 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version-file: '.nvmrc'
-          cache: 'npm'
-          
+          node-version-file: ".nvmrc"
+          cache: "npm"
+
       - name: Clean install dependencies
         run: |
           rm -rf node_modules package-lock.json
           npm install
-        
+
       - name: Install Playwright browsers
         run: npx playwright install chromium
-        
+
       - name: Run E2E tests
         run: npm run test:e2e
-        
+
       - name: Upload E2E results
         uses: actions/upload-artifact@v4
         if: always()
@@ -118,14 +118,14 @@ jobs:
           issue-number: ${{ github.event.pull_request.number }}
           body: |
             ## 🤖 Pull Request Validation Results
-            
+
             **Linting:** ${{ needs.lint.result == 'success' && '✅ Passed' || '❌ Failed' }}
             **Unit Tests:** ${{ needs.unit-tests.result == 'success' && '✅ Passed' || '❌ Failed' }}
             **E2E Tests:** ${{ needs.e2e-tests.result == 'success' && '✅ Passed' || '❌ Failed' }}
-            
+
             ---
             ${{ needs.lint.result == 'success' && needs.unit-tests.result == 'success' && needs.e2e-tests.result == 'success' && '🎉 All checks passed! This PR is ready for review.' || '⚠️ Some checks failed. Please review the failed jobs above.' }}
-            
+
             **Commit:** ${{ github.event.pull_request.head.sha }}
             **Author:** @${{ github.event.pull_request.user.login }}
-          reactions: ${{ needs.lint.result == 'success' && needs.unit-tests.result == 'success' && needs.e2e-tests.result == 'success' && 'rocket' || 'eyes' }} 
+          reactions: ${{ needs.lint.result == 'success' && needs.unit-tests.result == 'success' && needs.e2e-tests.result == 'success' && 'rocket' || 'eyes' }}

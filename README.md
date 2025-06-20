@@ -122,24 +122,29 @@ Projekt wykorzystuje GitHub Actions do automatyzacji testów i buildów. Pipelin
 ### Workflow: CI/CD Pipeline (`.github/workflows/ci-cd.yml`)
 
 **Uruchamianie:**
+
 - Automatycznie przy push do gałęzi `master`
-- Automatycznie przy pull request do gałęzi `master`  
+- Automatycznie przy pull request do gałęzi `master`
 - Manualnie poprzez GitHub UI (workflow_dispatch)
 
 **Etapy:**
 
 1. **Quality Checks** - Kontrola jakości kodu
+
    - ESLint (sprawdzanie jakości kodu)
    - Prettier (sprawdzanie formatowania)
 
 2. **Unit Tests** - Testy jednostkowe
+
    - Vitest (testy jednostkowe)
    - Generowanie raportów coverage
 
 3. **E2E Tests** - Testy end-to-end
-   - Playwright (testy  w przeglądarce Chromium)
+
+   - Playwright (testy w przeglądarce Chromium)
 
 4. **Production Build** - Build produkcyjny
+
    - Astro build (generowanie statycznych plików)
    - Uruchamia się tylko po pomyślnym przejściu testów jakości i jednostkowych
 
@@ -163,7 +168,7 @@ Projekt wykorzystuje GitHub Actions do automatyzacji testów i buildów. Pipelin
 # Testy jednostkowe
 npm run test:run
 
-# Testy E2E  
+# Testy E2E
 npm run test:e2e
 
 # Linting

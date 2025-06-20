@@ -5,18 +5,23 @@ Ten moduł zapewnia walidację i debugowanie zmiennych środowiskowych dla test�
 ## Funkcje
 
 ### `loadTestEnv()`
+
 Ładuje zmienne środowiskowe z pliku `.env.test`.
 
 ### `validateEnvVars()`
+
 Waliduje czy wszystkie wymagane zmienne środowiskowe są ustawione i wyświetla szczegółowe informacje debugowe.
 
 ### `getRequiredEnvVar(varName: string)`
+
 Pobiera wymaganą zmienną środowiskową. Rzuca błąd z pomocnymi informacjami jeśli zmienna nie jest ustawiona.
 
 ### `getOptionalEnvVar(varName: string, defaultValue: string)`
+
 Pobiera opcjonalną zmienną środowiskową z wartością domyślną.
 
 ### `debugTestEnvironment()`
+
 Wyświetla szczegółowe informacje debugowe o środowisku testowym.
 
 ## Wymagane zmienne środowiskowe
@@ -41,15 +46,16 @@ SUPABASE_ANON_KEY=your_supabase_key
 ## Przykład użycia
 
 ```typescript
-import { getRequiredEnvVar, getOptionalEnvVar } from './env-validator';
+import { getRequiredEnvVar, getOptionalEnvVar } from "./env-validator";
 
-const email = getRequiredEnvVar('TEST_USER_EMAIL');
-const useApiLogin = getOptionalEnvVar('USE_API_LOGIN', 'true');
+const email = getRequiredEnvVar("TEST_USER_EMAIL");
+const useApiLogin = getOptionalEnvVar("USE_API_LOGIN", "true");
 ```
 
 ## Komunikaty błędów
 
 Walidator wyświetla szczegółowe komunikaty błędów z:
+
 - Listą brakujących zmiennych
 - Opisem każdej zmiennej
 - Przykładami wartości
@@ -57,4 +63,4 @@ Walidator wyświetla szczegółowe komunikaty błędów z:
 
 ## Bezpieczeństwo
 
-Wrażliwe dane (hasła, klucze API) są maskowane w logach jako `***********`. 
+Wrażliwe dane (hasła, klucze API) są maskowane w logach jako `***********`.

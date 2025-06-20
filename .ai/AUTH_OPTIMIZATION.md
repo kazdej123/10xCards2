@@ -9,10 +9,12 @@ Ten dokument opisuje zoptymalizowaną implementację uwierzytelniania w testach 
 ### 1. Dwufazowe Podejście
 
 #### Faza 1: Tymczasowe podejście
+
 - Każdy test loguje się osobno przez UI
 - Łatwiejsze debugowanie
 
 #### Faza 2: Zoptymalizowane podejście
+
 - Sesje generowane raz i zapisywane do reużycia
 - Logowanie przez API (opcjonalne)
 - Znacznie szybsze wykonywanie testów
@@ -76,12 +78,14 @@ npx playwright test --project=chromium-guest
 ### LoginPage
 
 Klasa `LoginPage` zawiera metody do:
+
 - Logowania przez UI (`loginViaUI`)
-- Logowania przez API (`loginViaAPI`) 
+- Logowania przez API (`loginViaAPI`)
 - Walidacji stanu logowania
 - Wylogowania
 
 Przykład użycia:
+
 ```typescript
 const loginPage = new LoginPage(page);
 await loginPage.loginViaUI("email@test.com", "password");
@@ -91,13 +95,16 @@ await loginPage.verifyLoggedIn();
 ## Konwencje Testów
 
 ### Nazwy Plików
+
 - `*.authenticated.spec.ts` - testy wymagające uwierzytelniania
 - `*.guest.spec.ts` - testy bez uwierzytelniania
 - `*.setup.ts` - pliki setup
 - `*.cleanup.ts` - pliki cleanup
 
 ### Selektory
+
 Używaj `data-testid` zgodnie z konwencją:
+
 ```html
 <button data-testid="login-button">Zaloguj</button>
 ```
@@ -107,14 +114,15 @@ await page.getByTestId("login-button").click();
 ```
 
 ### Struktura Testów (AAA Pattern)
+
 ```typescript
 test("nazwa testu", async ({ page }) => {
   // Arrange - przygotowanie danych
   const element = page.getByTestId("selector");
-  
+
   // Act - wykonanie akcji
   await element.click();
-  
+
   // Assert - sprawdzenie wyników
   await expect(page).toHaveURL("/expected-url");
 });
@@ -123,20 +131,27 @@ test("nazwa testu", async ({ page }) => {
 ## Migracja z Obecnych Testów
 
 ### Krok 1: Identyfikacja testów wymagających uwierzytelniania
+
 Przejrzyj obecne testy i oznacz te, które wymagają logowania.
 
 ### Krok 2: Przygotowanie danych testowych
+
 Stwórz użytkowników testowych w bazie testowej:
+
 - Zwykły użytkownik (user)
 - Administrator (admin)
 
 ### Krok 3: Aktualizacja testów
+
 Przenieś testy do odpowiednich plików:
+
 - Testy wymagające logowania → `*.authenticated.spec.ts`
 - Testy publiczne → `*.guest.spec.ts`
 
 ### Krok 4: Dostosowanie selektorów
+
 Upewnij się, że strony zawierają `data-testid` dla kluczowych elementów:
+
 - `user-menu` - menu użytkownika
 - `login-form` - formularz logowania
 - `logout-button` - przycisk wylogowania
@@ -144,6 +159,7 @@ Upewnij się, że strony zawierają `data-testid` dla kluczowych elementów:
 ## Rozwiązywanie Problemów
 
 ### Problem: Setup nie może się zalogować
+
 ```bash
 # Sprawdź czy zmienne środowiskowe są ustawione
 echo $TEST_USER_EMAIL
@@ -153,6 +169,7 @@ npx playwright test --project=setup --headed --debug
 ```
 
 ### Problem: Testy nie widzą stanu uwierzytelniania
+
 ```bash
 # Sprawdź czy pliki stanu zostały utworzone
 ls -la e2e/.auth/
@@ -162,6 +179,7 @@ grep -n "storageState" playwright.config.ts
 ```
 
 ### Problem: Testy są nadal wolne
+
 ```bash
 # Sprawdź czy USE_API_LOGIN jest ustawione
 grep USE_API_LOGIN .env.test
@@ -173,14 +191,16 @@ npx playwright test --project=chromium-user
 ## Dalszy Rozwój
 
 ### Opcje rozszerzenia:
+
 1. **Różne role użytkowników** - dodanie więcej stanów uwierzytelniania
 2. **Testy międzybranżowe** - testowanie interakcji między różnymi rolami
 3. **Uwierzytelnianie OAuth** - obsługa zewnętrznych dostawców uwierzytelniania
 4. **Testy mobilne** - rozszerzenie na różne urządzenia
 
 ### Monitorowanie wydajności:
+
 ```bash
 # Porównanie czasów wykonania
 time npx playwright test --project=setup
 time npx playwright test --project=chromium-user
-``` 
+```

@@ -1,5 +1,4 @@
 import { test, expect } from "@playwright/test";
-import { GeneratePage } from "../page-objects/generate-page";
 
 test.describe("Generate Page Tests", () => {
   test.beforeEach(async ({ page }) => {

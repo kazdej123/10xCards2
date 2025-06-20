@@ -30,6 +30,7 @@ e2e/
 ### Setup
 
 1. Install dependencies:
+
    ```bash
    npm install
    ```
@@ -90,10 +91,10 @@ test.describe("Feature Name", () => {
   test("should do something specific", async ({ page }) => {
     // Arrange
     const homePage = new HomePage(page);
-    
+
     // Act
     await homePage.navigateToHome();
-    
+
     // Assert
     await homePage.verifyHomePageLoaded();
   });
@@ -111,7 +112,7 @@ Add data-testid attributes to your components:
 Then use them in tests:
 
 ```typescript
-await page.getByTestId('submit-button').click();
+await page.getByTestId("submit-button").click();
 ```
 
 ## Configuration
@@ -119,6 +120,7 @@ await page.getByTestId('submit-button').click();
 The Playwright configuration is in `playwright.config.ts` at the root level.
 
 Key configurations:
+
 - **Browser**: Only Chromium (Desktop Chrome)
 - **Base URL**: http://localhost:3000
 - **Parallel**: Enabled for faster execution
@@ -130,6 +132,7 @@ Key configurations:
 ## CI/CD Integration
 
 The tests are configured to run in CI with:
+
 - Reduced parallelism (workers: 1)
 - Automatic retries (2 attempts)
 - Multiple report formats (HTML, JSON, JUnit)
@@ -181,12 +184,14 @@ This directory contains complete E2E tests for the 10xCards application.
 ### Key Components
 
 ### 🔧 Configuration (playwright.config.ts)
+
 - Configured only for Chromium/Desktop Chrome
 - Enabled trace and debugging
 - Parallel execution
 - Automatic dev server
 
 ### 📋 Page Object Models
+
 - **BasePage**: Common methods for all pages
 - **HomePage**: Methods specific to the home page
 - **GeneratePage**: Methods for the generate flashcard page
@@ -196,12 +201,14 @@ This directory contains complete E2E tests for the 10xCards application.
 According to best practices, all UI components contain data-testid selectors:
 
 #### Authentication Components
+
 - `auth-buttons-container` - authentication buttons container
 - `login-button` - login button
 - `register-button` - register button
 - `logout-button` - logout button
 
 #### Generate Flashcard Components
+
 - `flashcard-generation-view` - main generation view
 - `text-input-area` - text input area
 - `source-text-input` - text input field
@@ -218,6 +225,7 @@ According to best practices, all UI components contain data-testid selectors:
 ### Test Scenarios
 
 #### 🏠 Home Page (home-page.spec.ts)
+
 - Loading the home page
 - Displaying authentication buttons
 - Navigating to login/register pages
@@ -225,6 +233,7 @@ According to best practices, all UI components contain data-testid selectors:
 - Visual tests (screenshots)
 
 #### 🎯 Generate Flashcards (generate.spec.ts)
+
 - Loading the generate page
 - Validating text length
 - Character counter
@@ -232,12 +241,14 @@ According to best practices, all UI components contain data-testid selectors:
 - Accessibility tests
 
 #### 🔄 Navigation (example.spec.ts)
+
 - Navigation flow between pages
 - Branding consistency
 - Page structure
 - Visual tests
 
 #### 🌐 API (api.spec.ts)
+
 - API endpoint tests
 - Input data validation
 - Error handling
@@ -246,6 +257,7 @@ According to best practices, all UI components contain data-testid selectors:
 ## Running Tests
 
 ### Preparation
+
 ```bash
 # Install dependencies
 npm install
@@ -255,6 +267,7 @@ npm run dev:e2e
 ```
 
 ### Running Tests
+
 ```bash
 # All tests
 npx playwright test
@@ -272,6 +285,7 @@ npx playwright test --debug
 ```
 
 ### Developer Tools
+
 ```bash
 # Codegen - recording tests
 npx playwright codegen http://localhost:3000
@@ -286,22 +300,26 @@ npx playwright show-report
 ## Best Practices
 
 ### ✅ AAA Structure
+
 All tests use the Arrange-Act-Assert pattern:
+
 ```typescript
 test("should do something", async ({ page }) => {
   // Arrange
   const homePage = new HomePage(page);
-  
+
   // Act
   await homePage.navigateToHome();
-  
+
   // Assert
   await expect(page).toHaveTitle(/Expected Title/);
 });
 ```
 
 ### ✅ Data-testid
+
 Use data-testid selectors instead of CSS selectors:
+
 ```typescript
 // ✅ Correct
 await page.getByTestId("login-button").click();
@@ -311,7 +329,9 @@ await page.click(".login-btn");
 ```
 
 ### ✅ Page Object Model
+
 Encapsulate page logic in Page Objects:
+
 ```typescript
 // ✅ Correct
 await homePage.clickLoginButton();
@@ -321,7 +341,9 @@ await page.getByTestId("login-button").click();
 ```
 
 ### ✅ Fixtures
+
 Use fixtures for shared Page Objects:
+
 ```typescript
 test("should test something", async ({ homePage, generatePage }) => {
   // homePage and generatePage are automatically available
@@ -331,12 +353,14 @@ test("should test something", async ({ homePage, generatePage }) => {
 ## Debugging
 
 ### Trace Viewer
+
 ```bash
 npx playwright test --trace on
 npx playwright show-trace
 ```
 
 ### Screenshots
+
 ```bash
 # Automatic screenshots on failures
 npx playwright test
@@ -346,6 +370,7 @@ await expect(page).toHaveScreenshot("expected.png");
 ```
 
 ### Console
+
 ```bash
 # Logs in console
 npx playwright test --reporter=line
@@ -354,17 +379,20 @@ npx playwright test --reporter=line
 ## Extensions
 
 ### Adding New Tests
+
 1. Add data-testid selectors to components
 2. Extend Page Objects in `page-objects/`
 3. Create new test file in `tests/`
 4. Use AAA pattern
 
 ### Adding New Page Objects
+
 1. Extend `BasePage`
 2. Add to `test-fixtures.ts`
 3. Use in tests via fixtures
 
 ### Mocking API
+
 ```typescript
 await page.route("**/api/endpoint", (route) => {
   route.fulfill({
@@ -378,13 +406,16 @@ await page.route("**/api/endpoint", (route) => {
 ## Monitoring
 
 ### CI/CD
+
 Tests are configured to:
+
 - Parallel execution
 - Retry on failures
 - Generate reports (HTML, JSON, JUnit)
 - Trace on failures
 
 ### Metrics
+
 - Test execution time
 - Test pass percentage
 - Visual coverage (screenshots)
@@ -392,7 +423,8 @@ Tests are configured to:
 ## Support
 
 In case of issues:
+
 1. Check if dev server is running: `npm run dev:e2e`
 2. Check trace: `npx playwright show-trace`
 3. Run with debug: `npx playwright test --debug`
-4. Check HTML report: `npx playwright show-report` 
+4. Check HTML report: `npx playwright show-report`

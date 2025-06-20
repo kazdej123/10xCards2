@@ -2,9 +2,9 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+    branches: [master]
   workflow_dispatch: # Umożliwia manualne uruchomienie
 
 jobs:
@@ -16,19 +16,19 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version-file: '.nvmrc'
-          cache: 'npm'
-          
+          node-version-file: ".nvmrc"
+          cache: "npm"
+
       - name: Install dependencies
         run: npm ci --force
-        
+
       - name: Run linter
         run: npm run lint
-        
+
       - name: Check formatting
         run: npm run format -- --check
 
@@ -40,24 +40,24 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version-file: '.nvmrc'
-          cache: 'npm'
-          
+          node-version-file: ".nvmrc"
+          cache: "npm"
+
       - name: Clean install dependencies
         run: |
           rm -rf node_modules package-lock.json
           npm install
-        
+
       - name: Run unit tests
         run: npm run test:run
-        
+
       - name: Generate coverage report
         run: npm run test:coverage
-        
+
       - name: Upload coverage reports
         uses: actions/upload-artifact@v4
         if: always()
@@ -74,24 +74,24 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version-file: '.nvmrc'
-          cache: 'npm'
-          
+          node-version-file: ".nvmrc"
+          cache: "npm"
+
       - name: Clean install dependencies
         run: |
           rm -rf node_modules package-lock.json
           npm install
-        
+
       - name: Install Playwright browsers
         run: npx playwright install chromium
-        
+
       - name: Run E2E tests
         run: npm run test:e2e
-        
+
       - name: Upload E2E results
         uses: actions/upload-artifact@v4
         if: always()
@@ -109,21 +109,21 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version-file: '.nvmrc'
-          cache: 'npm'
-          
+          node-version-file: ".nvmrc"
+          cache: "npm"
+
       - name: Clean install dependencies
         run: |
           rm -rf node_modules package-lock.json
           npm install
-        
+
       - name: Build for production
         run: npm run build
-        
+
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -146,4 +146,4 @@ jobs:
           echo "✅ Unit tests passed"
           echo "✅ E2E tests passed"
           echo "✅ Production build successful"
-          echo "🚀 Ready for deployment!" 
+          echo "🚀 Ready for deployment!"

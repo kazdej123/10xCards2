@@ -36,7 +36,7 @@ TEST_USER_ID_2=test-user-2-uuid
 TEST_ADMIN_USER_ID=test-admin-uuid
 
 # Test user credentials (for auth setup)
-TEST_USER_EMAIL=test@example.com 
+TEST_USER_EMAIL=test@example.com
 TEST_USER_PASSWORD=testpassword123
 ADMIN_USER_EMAIL=admin@example.com
 ADMIN_USER_PASSWORD=adminpassword123
@@ -60,7 +60,7 @@ Both use the `DatabaseCleanup` utility class from `e2e/fixtures/database-cleanup
 ## Database Tables Cleaned
 
 - `flashcards` - User's flashcard data
-- `generations` - AI generation metadata  
+- `generations` - AI generation metadata
 - `generation_error_logs` - Error logs
 
 ## Usage
@@ -97,15 +97,18 @@ e2e/
 ## Troubleshooting
 
 ### Cleanup Not Running
+
 - Check that `TEST_DATABASE_CLEANUP_ENABLED=true` in `.env.tests`
 - Verify Supabase credentials are correct
 - Check console output for error messages
 
 ### Permission Errors
+
 - Ensure `SUPABASE_SERVICE_ROLE_KEY` is set correctly
 - Verify the service role has delete permissions on all tables
 
 ### Incomplete Cleanup
+
 - Check that test user IDs are correctly set in `.env.tests`
 - Use `TEST_DATABASE_RESET_ON_TEARDOWN=true` for complete cleanup (use with caution)
 
@@ -122,4 +125,4 @@ e2e/
 - Store sensitive keys in CI/CD environment variables
 - Use least privilege principle for service role
 - Regularly rotate test database credentials
-- Monitor test database access logs 
+- Monitor test database access logs
