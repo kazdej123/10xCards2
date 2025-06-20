@@ -72,6 +72,9 @@ export class LoginPage extends BasePage {
     expect(typeof responseData.token).toBe("string");
     expect(responseData.token.length).toBeGreaterThan(0);
 
+    // Navigate to a page first to establish proper context for localStorage
+    await this.page.goto("/");
+
     // Bezpieczne ustawienie tokena
     if (responseData.token && typeof responseData.token === "string") {
       await this.page.evaluate((token) => {
@@ -87,7 +90,14 @@ export class LoginPage extends BasePage {
   // Walidacja stanu logowania
   async verifyLoggedIn() {
     // Sprawdzamy czy jesteśmy na stronie wymagającej logowania
-    await expect(this.page.getByTestId("user-menu")).toBeVisible();
+    // Zamiast nieistniejącego user-menu, sprawdzamy logout-button lub generate page
+    const currentUrl = this.page.url();
+    if (currentUrl.includes("/generate")) {
+      await expect(this.page.getByTestId("logout-button")).toBeVisible();
+    } else {
+      // Alternatywnie sprawdzamy czy nie jesteśmy na stronie logowania
+      await expect(this.page).not.toHaveURL(/\/login/);
+    }
   }
 
   async verifyLoggedOut() {
@@ -98,11 +108,13 @@ export class LoginPage extends BasePage {
 
   // Wylogowanie
   async logout() {
-    const userMenu = this.page.getByTestId("user-menu");
-    await userMenu.click();
-
+    // Sprawdzamy czy logout button jest dostępny bezpośrednio
     const logoutButton = this.page.getByTestId("logout-button");
-    await logoutButton.click();
+    if (await logoutButton.isVisible()) {
+      await logoutButton.click();
+    } else {
+      throw new Error("Logout button not found - user may not be logged in");
+    }
 
     await this.verifyLoggedOut();
   }

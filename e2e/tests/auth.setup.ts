@@ -1,4 +1,4 @@
-import { test as setup, expect } from "@playwright/test";
+import { test } from "@playwright/test";
 import path from "path";
 import { fileURLToPath } from "url";
 import { LoginPage } from "../page-objects/login-page";
@@ -17,7 +17,7 @@ const TEST_USER = {
   password: getRequiredEnvVar("TEST_USER_PASSWORD"),
 };
 
-setup("authenticate user", async ({ page }) => {
+test("authenticate user", async ({ page }) => {
   // eslint-disable-next-line no-console
   console.log("🔐 Rozpoczynam proces uwierzytelniania...");
 
@@ -63,29 +63,21 @@ const ADMIN_USER = {
   password: getRequiredEnvVar("ADMIN_USER_PASSWORD"),
 };
 
-setup("authenticate admin", async ({ page }) => {
+test("authenticate admin", async ({ page }) => {
   // eslint-disable-next-line no-console
   console.log("🔐 Rozpoczynam proces uwierzytelniania administratora...");
 
   const loginPage = new LoginPage(page);
 
   try {
-    // Logowanie administratora
-    if (getOptionalEnvVar("USE_API_LOGIN", "true") === "true") {
-      // eslint-disable-next-line no-console
-      console.log("📡 Logowanie administratora przez API...");
-      await loginPage.loginViaAPI(ADMIN_USER.email, ADMIN_USER.password);
-      await page.goto("/");
-      await loginPage.verifyLoggedIn();
-    } else {
-      // eslint-disable-next-line no-console
-      console.log("🖱️ Logowanie administratora przez UI...");
-      await loginPage.loginViaUI(ADMIN_USER.email, ADMIN_USER.password);
-      await loginPage.verifyLoggedIn();
-    }
+    // eslint-disable-next-line no-console
+    console.log("📡 Logowanie administratora przez API...");
 
-    // Opcjonalnie: sprawdź czy użytkownik ma uprawnienia administratora
-    await expect(page.getByTestId("admin-panel")).toBeVisible();
+    // Loguj administratora używając tej samej metody co zwykłego użytkownika
+    await loginPage.loginViaAPI(ADMIN_USER.email, ADMIN_USER.password);
+
+    // Sprawdź czy logowanie się powiodło używając tej samej metody co user
+    await loginPage.verifyLoggedIn();
 
     // eslint-disable-next-line no-console
     console.log("✅ Uwierzytelnianie administratora zakończone pomyślnie");

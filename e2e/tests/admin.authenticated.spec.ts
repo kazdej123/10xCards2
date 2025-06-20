@@ -1,51 +1,41 @@
 import { test, expect } from "@playwright/test";
 
-// Ten test używa stanu uwierzytelnienia administratora z pliku e2e/.auth/admin.json
-// dzięki konfiguracji projektu "chromium-admin" w playwright.config.ts
+// Ten test sprawdza funkcjonalność dostępną dla uwierzytelnionych użytkowników
+// zmieniony z testów admin panel (który nie istnieje) na testy generate page
 
-test.describe("Panel administratora - Uwierzytelniony administrator", () => {
+test.describe("Generate Page - Uwierzytelniony użytkownik", () => {
   test.beforeEach(async ({ page }) => {
-    // Strona jest już uwierzytelniona jako administrator dzięki storageState
-    await page.goto("/admin");
+    // Nawigujemy do strony generowania fiszek
+    await page.goto("/generate");
   });
 
-  test("powinien wyświetlić panel administratora", async ({ page }) => {
+  test("powinien wyświetlić stronę generowania fiszek", async ({ page }) => {
     // Arrange - dane już załadowane w beforeEach
 
     // Act & Assert
-    await expect(page.getByTestId("admin-panel")).toBeVisible();
-    await expect(page.getByTestId("admin-title")).toContainText("Panel Administratora");
-    await expect(page.getByTestId("user-menu")).toBeVisible();
+    await expect(page.getByText("Generuj fiszki")).toBeVisible();
+    await expect(page.getByTestId("logout-button")).toBeVisible();
+    await expect(page.getByTestId("flashcard-generation-view")).toBeVisible();
   });
 
-  test("powinien umożliwić zarządzanie użytkownikami", async ({ page }) => {
-    // Act
-    const usersSection = page.getByTestId("users-management");
-    await usersSection.click();
-
-    // Assert
-    await expect(page).toHaveURL(/admin\/users/);
-    await expect(page.getByTestId("users-table")).toBeVisible();
-    await expect(page.getByTestId("add-user-button")).toBeVisible();
+  test("powinien wyświetlić pole do wprowadzania tekstu", async ({ page }) => {
+    // Act & Assert
+    await expect(page.getByTestId("source-text-input")).toBeVisible();
+    await expect(page.getByTestId("generate-button")).toBeVisible();
   });
 
-  test("powinien mieć dostęp do ustawień systemowych", async ({ page }) => {
+  test("powinien umożliwić wylogowanie", async ({ page }) => {
     // Act
-    const settingsLink = page.getByTestId("system-settings-link");
-    await settingsLink.click();
+    const logoutButton = page.getByTestId("logout-button");
+    await logoutButton.click();
 
     // Assert
-    await expect(page).toHaveURL(/admin\/settings/);
-    await expect(page.getByTestId("system-settings-form")).toBeVisible();
+    await expect(page).toHaveURL(/login|home/);
   });
 
-  test("powinien wyświetlić statystyki systemu", async ({ page }) => {
-    // Act
-    const statsSection = page.getByTestId("system-stats");
-
-    // Assert
-    await expect(statsSection).toBeVisible();
-    await expect(page.getByTestId("total-users")).toBeVisible();
-    await expect(page.getByTestId("active-sessions")).toBeVisible();
+  test("powinien wyświetlić informacje o użytkowniku", async ({ page }) => {
+    // Act & Assert
+    await expect(page.getByText("Witaj")).toBeVisible();
+    await expect(page.getByText("Użytkowniku")).toBeVisible();
   });
 });

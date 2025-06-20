@@ -21,6 +21,30 @@ export const onRequest = defineMiddleware(async ({ locals, cookies, url, request
     return next();
   }
 
+  // Skip middleware auth for API routes - let them handle their own authentication
+  if (url.pathname.startsWith("/api/")) {
+    const supabase = createSupabaseServerInstance({
+      cookies,
+      headers: request.headers,
+    });
+    locals.supabase = supabase;
+
+    // Get user session for API routes
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    // Store user in locals if authenticated (API routes will check this)
+    if (user) {
+      locals.user = {
+        id: user.id,
+        email: user.email,
+      };
+    }
+
+    return next();
+  }
+
   const supabase = createSupabaseServerInstance({
     cookies,
     headers: request.headers,

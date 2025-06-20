@@ -73,7 +73,10 @@ export function RegisterForm() {
   };
 
   return (
-    <div className="w-full max-w-md mx-auto p-8 bg-white/10 backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl">
+    <div
+      className="w-full max-w-md mx-auto p-8 bg-white/10 backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl"
+      data-testid="register-form"
+    >
       <div className="space-y-2 text-center mb-6">
         <h1 className="text-3xl font-bold text-white bg-gradient-to-r from-blue-200 via-purple-200 to-pink-200 text-transparent bg-clip-text">
           Rejestracja
@@ -88,6 +91,7 @@ export function RegisterForm() {
           </Label>
           <input
             id="email"
+            data-testid="email-input"
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -103,6 +107,7 @@ export function RegisterForm() {
           </Label>
           <input
             id="password"
+            data-testid="password-input"
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -119,6 +124,7 @@ export function RegisterForm() {
           </Label>
           <input
             id="confirmPassword"
+            data-testid="confirm-password-input"
             type="password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
@@ -129,13 +135,19 @@ export function RegisterForm() {
         </div>
 
         {error && (
-          <div className="p-4 text-sm text-red-200 bg-red-500/20 border border-red-500/30 rounded-lg backdrop-blur-sm">
+          <div
+            className="p-4 text-sm text-red-200 bg-red-500/20 border border-red-500/30 rounded-lg backdrop-blur-sm"
+            data-testid="error-message"
+          >
             {error}
           </div>
         )}
 
         {success && (
-          <div className="p-4 text-sm text-green-200 bg-green-500/20 border border-green-500/30 rounded-lg backdrop-blur-sm">
+          <div
+            className="p-4 text-sm text-green-200 bg-green-500/20 border border-green-500/30 rounded-lg backdrop-blur-sm"
+            data-testid="success-message"
+          >
             {success}
           </div>
         )}
@@ -143,6 +155,7 @@ export function RegisterForm() {
         <div className="space-y-4">
           <Button
             type="submit"
+            data-testid="register-button"
             className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-3 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl"
             disabled={isLoading}
           >

@@ -1,69 +1,54 @@
 import { test, expect } from "@playwright/test";
 
-// Ten test używa stanu uwierzytelnienia z pliku e2e/.auth/user.json
-// dzięki konfiguracji projektu "chromium-user" w playwright.config.ts
+// Ten test sprawdza stronę generowania fiszek (faktyczną funkcjonalność)
+// zamiast nieistniejącego dashboardu
 
-test.describe("Dashboard - Uwierzytelniony użytkownik", () => {
+test.describe("Generate Page - Uwierzytelniony użytkownik", () => {
   test.beforeEach(async ({ page }) => {
-    // Strona jest już uwierzytelniona dzięki storageState
-    await page.goto("/dashboard");
+    // Nawigujemy do strony generowania zamiast nieistniejącego dashboardu
+    await page.goto("/generate");
   });
 
-  test("powinien wyświetlić dashboard użytkownika", async ({ page }) => {
+  test("powinien wyświetlić stronę generowania fiszek", async ({ page }) => {
     // Arrange - dane już załadowane w beforeEach
 
-    // Act - sprawdzamy elementy dashboardu
-    const userMenu = page.getByTestId("user-menu");
-    const dashboardTitle = page.getByTestId("dashboard-title");
+    // Act - sprawdzamy elementy strony generowania
+    const pageTitle = page.getByText("Generuj fiszki");
+    const logoutButton = page.getByTestId("logout-button");
 
     // Assert
-    await expect(userMenu).toBeVisible();
-    await expect(dashboardTitle).toBeVisible();
-    await expect(dashboardTitle).toContainText("Dashboard");
+    await expect(pageTitle).toBeVisible();
+    await expect(logoutButton).toBeVisible();
   });
 
-  test("powinien umożliwić nawigację do ustawień", async ({ page }) => {
+  test("powinien wyświetlić formularz generowania", async ({ page }) => {
     // Arrange
-    const userMenu = page.getByTestId("user-menu");
-
-    // Act
-    await userMenu.click();
-    const settingsLink = page.getByTestId("settings-link");
-    await settingsLink.click();
-
-    // Assert
-    await expect(page).toHaveURL(/settings/);
-    await expect(page.getByTestId("settings-form")).toBeVisible();
-  });
-
-  test("powinien wyświetlić dane użytkownika", async ({ page }) => {
-    // Arrange
-    const profileSection = page.getByTestId("profile-section");
+    const sourceTextInput = page.getByTestId("source-text-input");
+    const generateButton = page.getByTestId("generate-button");
 
     // Act & Assert
-    await expect(profileSection).toBeVisible();
+    await expect(sourceTextInput).toBeVisible();
+    await expect(generateButton).toBeVisible();
+  });
 
-    // Sprawdzamy czy wyświetla się email użytkownika testowego
-    const userEmail = page.getByTestId("user-email");
-    await expect(userEmail).toBeVisible();
+  test("powinien wyświetlić informacje o użytkowniku", async ({ page }) => {
+    // Arrange
+    const welcomeText = page.getByText("Witaj");
+    const userText = page.getByText("Użytkowniku");
 
-    // Opcjonalnie: sprawdź konkretną wartość jeśli jest znana
-    // await expect(userEmail).toContainText("test@example.com");
+    // Act & Assert
+    await expect(welcomeText).toBeVisible();
+    await expect(userText).toBeVisible();
   });
 
   test("powinien umożliwić wylogowanie", async ({ page }) => {
     // Arrange
-    const userMenu = page.getByTestId("user-menu");
+    const logoutButton = page.getByTestId("logout-button");
 
     // Act
-    await userMenu.click();
-    const logoutButton = page.getByTestId("logout-button");
     await logoutButton.click();
 
-    // Assert - sprawdzamy czy zostaliśmy przekierowani do strony logowania
+    // Assert - sprawdzamy czy zostaliśmy przekierowani
     await expect(page).toHaveURL(/login|home/);
-
-    // Sprawdzamy czy elementy wymagające logowania znikły
-    await expect(userMenu).not.toBeVisible();
   });
 });

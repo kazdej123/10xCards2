@@ -65,10 +65,15 @@ export default defineConfig({
         // Użyj zapisanego stanu uwierzytelniania
         storageState: "e2e/.auth/user.json",
       },
+      testMatch: [
+        "**/dashboard.authenticated.spec.ts",
+        "**/generate.authenticated.spec.ts",
+        "**/user.authenticated.spec.ts",
+      ],
       dependencies: ["setup"],
     },
 
-    // Testing project z uwierzytelnonym administratorem
+    // Testing project z uwierzytelnionym administratorem
     {
       name: "chromium-admin",
       use: {
@@ -76,6 +81,7 @@ export default defineConfig({
         // Użyj zapisanego stanu uwierzytelniania administratora
         storageState: "e2e/.auth/admin.json",
       },
+      testMatch: ["**/admin.authenticated.spec.ts"],
       dependencies: ["setup"],
     },
 
@@ -87,6 +93,15 @@ export default defineConfig({
         // Resetuj stan uwierzytelniania
         storageState: { cookies: [], origins: [] },
       },
+      testMatch: [
+        "**/public-pages.guest.spec.ts",
+        "**/api.spec.ts",
+        "**/generate.spec.ts",
+        "**/home-page.spec.ts",
+        "**/security.spec.ts",
+        "**/example.spec.ts",
+        "**/env-validation.spec.ts",
+      ],
     },
   ],
 

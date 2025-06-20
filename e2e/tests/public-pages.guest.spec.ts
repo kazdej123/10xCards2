@@ -9,12 +9,10 @@ test.describe("Strony publiczne - Nieuwierzytelniony użytkownik", () => {
     // Act
     await page.goto("/");
 
-    // Assert
+    // Assert - sprawdzamy elementy, które rzeczywiście istnieją
     await expect(page.getByTestId("home-title")).toBeVisible();
     await expect(page.getByTestId("login-button")).toBeVisible();
-
-    // Sprawdzamy że menu użytkownika nie jest widoczne
-    await expect(page.getByTestId("user-menu")).not.toBeVisible();
+    await expect(page.getByTestId("register-button")).toBeVisible();
   });
 
   test("powinien wyświetlić stronę logowania", async ({ page }) => {
@@ -31,19 +29,24 @@ test.describe("Strony publiczne - Nieuwierzytelniony użytkownik", () => {
     await expect(loginPage.loginButton).toBeVisible();
   });
 
+  test("powinien wyświetlić stronę rejestracji", async ({ page }) => {
+    // Act
+    await page.goto("/register");
+
+    // Assert
+    await expect(page.getByTestId("register-form")).toBeVisible();
+    await expect(page.getByTestId("email-input")).toBeVisible();
+    await expect(page.getByTestId("password-input")).toBeVisible();
+    await expect(page.getByTestId("register-button")).toBeVisible();
+  });
+
   test("powinien przekierować do logowania przy próbie dostępu do chronionej strony", async ({ page }) => {
     // Act - próbujemy dostać się do chronionej strony
-    await page.goto("/dashboard");
+    await page.goto("/generate");
 
     // Assert - powinniśmy zostać przekierowani do logowania
     await expect(page).toHaveURL(/\/login/);
     await expect(page.getByTestId("login-form")).toBeVisible();
-
-    // Dodatkowo sprawdź komunikat o konieczności logowania
-    const loginTitle = page.getByTestId("login-title");
-    if (await loginTitle.isVisible()) {
-      await expect(loginTitle).toContainText(/zaloguj|login/i);
-    }
   });
 
   test("powinien umożliwić logowanie przez UI", async ({ page }) => {
