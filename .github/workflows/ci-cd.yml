@@ -71,6 +71,13 @@ jobs:
     runs-on: ubuntu-latest
     env:
       NODE_ENV: test
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      TEST_USER_EMAIL: test@example.com
+      TEST_USER_PASSWORD: testpassword123
+      ADMIN_USER_EMAIL: admin@example.com
+      ADMIN_USER_PASSWORD: adminpassword123
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -106,6 +113,8 @@ jobs:
     needs: [quality-checks, unit-tests]
     env:
       NODE_ENV: production
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

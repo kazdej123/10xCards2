@@ -115,6 +115,11 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          NODE_ENV: test
+          TEST_USER_EMAIL: test@example.com
+          TEST_USER_PASSWORD: testpassword123
+          ADMIN_USER_EMAIL: admin@example.com
+          ADMIN_USER_PASSWORD: adminpassword123
         run: npm run test:e2e
 
       - name: Upload E2E results

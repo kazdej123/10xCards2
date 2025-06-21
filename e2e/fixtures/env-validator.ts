@@ -72,14 +72,21 @@ export function loadTestEnv(): void {
   // eslint-disable-next-line no-console
   console.log(`🔧 File exists: ${fs.existsSync(envPath)}`);
 
-  if (fs.existsSync(envPath)) {
+  // In CI environment, prioritize environment variables over .env.test file
+  if (process.env.CI && process.env.SUPABASE_URL && process.env.SUPABASE_KEY) {
+    // eslint-disable-next-line no-console
+    console.log("🔧 Using environment variables from CI (file not required)");
+  } else if (fs.existsSync(envPath)) {
     // eslint-disable-next-line no-console
     console.log("🔧 File contents:");
     // eslint-disable-next-line no-console
     console.log(fs.readFileSync(envPath, "utf8"));
-  }
 
-  dotenv.config({ path: envPath });
+    dotenv.config({ path: envPath });
+  } else {
+    // eslint-disable-next-line no-console
+    console.log("🔧 No .env.test file found, relying on environment variables");
+  }
 
   // Debug loaded variables
   // eslint-disable-next-line no-console
