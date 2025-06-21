@@ -74,10 +74,11 @@ jobs:
       SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
       SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-      TEST_USER_EMAIL: test@example.com
-      TEST_USER_PASSWORD: testpassword123
-      ADMIN_USER_EMAIL: admin@example.com
-      ADMIN_USER_PASSWORD: adminpassword123
+      TEST_USER_EMAIL: ${{ secrets.TEST_USER_EMAIL }}
+      TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
+      ADMIN_USER_EMAIL: ${{ secrets.ADMIN_USER_EMAIL }}
+      ADMIN_USER_PASSWORD: ${{ secrets.ADMIN_USER_PASSWORD }}
+      USE_API_LOGIN: true
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
