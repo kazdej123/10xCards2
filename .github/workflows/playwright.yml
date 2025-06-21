@@ -25,6 +25,10 @@ jobs:
 
       - name: Create .env.test file
         run: |
+          echo "🔧 Creating .env.test file..."
+          echo "🔧 Available secrets check:"
+          echo "SUPABASE_URL: ${{ secrets.SUPABASE_URL != '' && 'SET' || 'NOT SET' }}"
+          echo "SUPABASE_KEY: ${{ secrets.SUPABASE_KEY != '' && 'SET' || 'NOT SET' }}"
           echo "SUPABASE_URL=${{ secrets.SUPABASE_URL }}" > .env.test
           echo "SUPABASE_KEY=${{ secrets.SUPABASE_KEY }}" >> .env.test
           echo "NODE_ENV=test" >> .env.test
@@ -32,11 +36,16 @@ jobs:
           echo "TEST_USER_PASSWORD=testpassword123" >> .env.test
           echo "ADMIN_USER_EMAIL=admin@example.com" >> .env.test
           echo "ADMIN_USER_PASSWORD=adminpassword123" >> .env.test
+          echo "🔧 Contents of .env.test:"
+          cat .env.test
 
       - name: Install Playwright Browsers
         run: npx playwright install chromium
 
       - name: Run Playwright tests
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
         run: npm run test:e2e
 
       - uses: actions/upload-artifact@v4

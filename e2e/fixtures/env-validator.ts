@@ -1,5 +1,6 @@
 import dotenv from "dotenv";
 import path from "path";
+import fs from "fs";
 
 // Interfejs dla wymaganych zmiennych środowiskowych
 type RequiredEnvVars = Record<
@@ -67,7 +68,24 @@ export function loadTestEnv(): void {
   // eslint-disable-next-line no-console
   console.log(`🔧 Ładowanie zmiennych środowiskowych z: ${envPath}`);
 
+  // Debug information - check if file exists
+  // eslint-disable-next-line no-console
+  console.log(`🔧 File exists: ${fs.existsSync(envPath)}`);
+
+  if (fs.existsSync(envPath)) {
+    // eslint-disable-next-line no-console
+    console.log("🔧 File contents:");
+    // eslint-disable-next-line no-console
+    console.log(fs.readFileSync(envPath, "utf8"));
+  }
+
   dotenv.config({ path: envPath });
+
+  // Debug loaded variables
+  // eslint-disable-next-line no-console
+  console.log(`🔧 After loading - SUPABASE_URL: ${process.env.SUPABASE_URL ? "SET" : "NOT SET"}`);
+  // eslint-disable-next-line no-console
+  console.log(`🔧 After loading - SUPABASE_KEY: ${process.env.SUPABASE_KEY ? "SET" : "NOT SET"}`);
 }
 
 /**

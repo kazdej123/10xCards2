@@ -91,6 +91,11 @@ jobs:
 
       - name: Create .env.test file
         run: |
+          echo "🔧 Creating .env.test file..."
+          echo "🔧 Available secrets check:"
+          echo "SUPABASE_URL: ${{ secrets.SUPABASE_URL != '' && 'SET' || 'NOT SET' }}"
+          echo "SUPABASE_KEY: ${{ secrets.SUPABASE_KEY != '' && 'SET' || 'NOT SET' }}"
+          echo "SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY != '' && 'SET' || 'NOT SET' }}"
           echo "SUPABASE_URL=${{ secrets.SUPABASE_URL }}" > .env.test
           echo "SUPABASE_KEY=${{ secrets.SUPABASE_KEY }}" >> .env.test
           echo "SUPABASE_SERVICE_ROLE_KEY=${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" >> .env.test
@@ -99,11 +104,17 @@ jobs:
           echo "TEST_USER_PASSWORD=testpassword123" >> .env.test
           echo "ADMIN_USER_EMAIL=admin@example.com" >> .env.test
           echo "ADMIN_USER_PASSWORD=adminpassword123" >> .env.test
+          echo "🔧 Contents of .env.test:"
+          cat .env.test
 
       - name: Install Playwright browsers
         run: npx playwright install chromium
 
       - name: Run E2E tests
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: npm run test:e2e
 
       - name: Upload E2E results
