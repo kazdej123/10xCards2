@@ -41,9 +41,36 @@ test.describe("Generate Page - Uwierzytelniony użytkownik", () => {
     await waitForTestElement(page, "generate-button");
   });
 
+  test("powinien wyświetlić informacje o użytkowniku", async ({ page }) => {
+    // Debug info
+    await debugPageState(page, "test start - user info");
+
+    // Act & Assert - wait for text to be rendered with CI-friendly timeout
+    await expect(page.getByText("Witaj,")).toBeVisible({ timeout: 15000 });
+    await expect(page.getByText("Użytkowniku")).toBeVisible({ timeout: 15000 });
+  });
+});
+
+// Oddzielny describe block dla testu wylogowania żeby nie psył sesji innych testów
+test.describe("Generate Page - Test wylogowania", () => {
+  test.beforeEach(async ({ page }) => {
+    // Nawigujemy do strony generowania fiszek z lepszą obsługą hydratacji
+    await navigateAndWaitForHydration(page, "/generate");
+
+    // Debug info for CI troubleshooting
+    await debugPageState(page, "logout test - beforeEach");
+
+    // Wait for key elements to be available
+    await Promise.race([
+      waitForTestElement(page, "flashcard-generation-view"),
+      waitForTestElement(page, "logout-button"),
+      page.waitForSelector('h1:has-text("Generuj fiszki")', { state: "visible", timeout: 30000 }),
+    ]);
+  });
+
   test("powinien umożliwić wylogowanie", async ({ page }) => {
     // Debug info
-    await debugPageState(page, "test start - logout");
+    await debugPageState(page, "logout test - start");
 
     // Arrange - wait for button to be fully interactive
     await waitForTestElement(page, "logout-button");
@@ -56,14 +83,5 @@ test.describe("Generate Page - Uwierzytelniony użytkownik", () => {
 
     // Assert - with longer timeout for CI
     await expect(page).toHaveURL(/\/login|\/home|\/$/, { timeout: 15000 });
-  });
-
-  test("powinien wyświetlić informacje o użytkowniku", async ({ page }) => {
-    // Debug info
-    await debugPageState(page, "test start - user info");
-
-    // Act & Assert - wait for text to be rendered with CI-friendly timeout
-    await expect(page.getByText("Witaj,")).toBeVisible({ timeout: 15000 });
-    await expect(page.getByText("Użytkowniku")).toBeVisible({ timeout: 15000 });
   });
 });
