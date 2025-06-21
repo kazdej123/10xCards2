@@ -55,6 +55,9 @@ test.describe("Home Page Tests", () => {
   });
 
   test("should take screenshot for visual regression testing", async ({ page }) => {
+    // Skip visual regression tests in CI due to platform rendering differences
+    test.skip(!!process.env.CI, "Visual regression tests skipped in CI due to Linux/Windows rendering differences");
+
     // Arrange
     const homePage = new HomePage(page);
 

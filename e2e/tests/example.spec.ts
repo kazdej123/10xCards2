@@ -49,7 +49,11 @@ test.describe("Application Navigation Tests", () => {
     await expect(generatePage.getPage().locator('a:has-text("10xCards.ai")')).toBeVisible();
   });
 
+  // Visual regression test - skip in CI due to platform differences
   test("should take comprehensive screenshots for visual regression", async ({ homePage, generatePage }) => {
+    // Skip visual regression tests in CI due to platform rendering differences
+    test.skip(!!process.env.CI, "Visual regression tests skipped in CI due to Linux/Windows rendering differences");
+
     // Arrange & Act - Home page screenshot
     await homePage.navigateToHome();
     await homePage.getPage().waitForLoadState("networkidle");
