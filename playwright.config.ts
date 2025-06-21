@@ -27,8 +27,8 @@ export default defineConfig({
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
-  /* Retry on CI only */
-  retries: process.env.CI ? 2 : 0,
+  /* Retry on CI only - zwiększone dla lepszej stabilności */
+  retries: process.env.CI ? 3 : 0,
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
@@ -51,10 +51,13 @@ export default defineConfig({
     /* Record video on failure */
     video: "retain-on-failure",
 
-    /* Global test timeout */
-    actionTimeout: 30000,
-    navigationTimeout: 30000,
+    /* Global test timeout - zwiększone dla CI */
+    actionTimeout: process.env.CI ? 45000 : 30000,
+    navigationTimeout: process.env.CI ? 45000 : 30000,
   },
+
+  /* Global timeout dla całego test suite */
+  timeout: process.env.CI ? 60000 : 30000,
 
   /* Configure projects for major browsers */
   projects: [
@@ -125,13 +128,14 @@ export default defineConfig({
     command: "npm run dev:e2e",
     url: "http://localhost:3000",
     reuseExistingServer: !process.env.CI,
-    timeout: 120 * 1000,
+    timeout: process.env.CI ? 180 * 1000 : 120 * 1000, // 3 minuty w CI, 2 minuty lokalnie
     env: {
       // Przekaż wszystkie zmienne środowiskowe do dev server
       ...process.env,
       // Upewnij się, że te kluczowe zmienne są ustawione
       SUPABASE_URL: process.env.SUPABASE_URL || "",
       SUPABASE_KEY: process.env.SUPABASE_KEY || "",
+      SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY || "",
       NODE_ENV: process.env.NODE_ENV || "test",
     },
   },

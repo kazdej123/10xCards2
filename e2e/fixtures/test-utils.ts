@@ -151,3 +151,89 @@ export class TestUtils {
     return await this.page.getByTestId(testId).getAttribute(attribute);
   }
 }
+
+/**
+ * Waits for React hydration to complete in CI environment
+ * This is particularly important for Astro + React SSR apps
+ */
+export async function waitForReactHydration(page: Page): Promise<void> {
+  // In CI environment, React hydration can take longer
+  if (process.env.CI) {
+    console.log("🔧 CI detected - waiting for React hydration...");
+    await page.waitForTimeout(3000);
+
+    // Additional check - wait for React to be available
+    await page
+      .waitForFunction(
+        () => {
+          // Check if React is available and components are hydrated
+          return window.React !== undefined || document.querySelector("[data-reactroot]") !== null;
+        },
+        { timeout: 10000 }
+      )
+      .catch(() => {
+        // If React detection fails, that's okay - some components might not use React
+        console.log("⚠️ React detection timeout - proceeding anyway");
+      });
+  } else {
+    // Local environment - shorter wait
+    await page.waitForTimeout(1000);
+  }
+}
+
+/**
+ * Enhanced navigation with hydration wait
+ */
+export async function navigateAndWaitForHydration(page: Page, url: string): Promise<void> {
+  await page.goto(url);
+  await page.waitForLoadState("networkidle");
+  await waitForReactHydration(page);
+}
+
+/**
+ * Wait for test element with CI-friendly timeout and better error handling
+ */
+export async function waitForTestElement(
+  page: Page,
+  testId: string,
+  options: { timeout?: number; visible?: boolean } = {}
+): Promise<void> {
+  const timeout = options.timeout || (process.env.CI ? 30000 : 15000);
+  const shouldBeVisible = options.visible !== false;
+
+  try {
+    const element = page.getByTestId(testId);
+    if (shouldBeVisible) {
+      await expect(element).toBeVisible({ timeout });
+    } else {
+      await expect(element).toBeAttached({ timeout });
+    }
+  } catch (error) {
+    console.error(`❌ Failed to find element with testId: ${testId}`);
+    console.error(`   Timeout: ${timeout}ms`);
+    console.error(`   CI environment: ${process.env.CI ? "Yes" : "No"}`);
+    throw error;
+  }
+}
+
+/**
+ * Debug helper to log page state
+ */
+export async function debugPageState(page: Page, context: string): Promise<void> {
+  if (process.env.CI) {
+    console.log(`🐛 Debug page state (${context}):`);
+    console.log(`   URL: ${page.url()}`);
+    console.log(`   Title: ${await page.title()}`);
+
+    // Check for common elements
+    const elements = ["flashcard-generation-view", "logout-button", "source-text-input", "generate-button"];
+
+    for (const testId of elements) {
+      const isVisible = await page
+        .getByTestId(testId)
+        .isVisible()
+        .catch(() => false);
+      console.log(`   ${testId}: ${isVisible ? "✅ visible" : "❌ not visible"}`);
+    }
+  }
+}
